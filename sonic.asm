@@ -17,11 +17,11 @@ Revision = 1
 ; 	| If 2, build the hacked version from Sonic Mega Collection, dubbed REVXB,
 ;	|       which (sloppily) fixes the infamous "spike bug" -- not recommended
 
-FixBugs = 0
+FixBugs = 1
 ;	| If 1, enables various bugfixes across the game and sound driver
 ;	| See also FixMusicAndSFXDataBugs
 
-AllOptimizations = 0
+AllOptimizations = 1
 ;	| If 1, enables all optimizations
 SkipChecksumCheck = 0|AllOptimizations
 ;	| If 1, disables the slow bootup checksum calculation
@@ -30,14 +30,16 @@ ZeroOffsetOptimization = 0|AllOptimizations
 PaddingOptimization = 0|AllOptimizations
 ;	| If 1, removes about 3 KB of various superfluous padding
 
-EnableSRAM = 0
+EnableSRAM = 1
 ;	| If 1, enable SRAM support
 BackupSRAM = 1
 ;	| 0 = no saving (read-only SRAM); 1 = allow saving
-AddressSRAM = 3
+AddressSRAM = 0
 ;	| 0 = odd+even; 2 = even only; 3 = odd only
 ;	| (odd only is the most common)
 
+NewStuff = 0
+;	| 0 = Normal Game; 1 = Has spindash, peel-out, and homing attack; 2 = More zones, unrestricted moves, and (potentially) more characters.
 ZoneCount = 6
 ;	| Used for the zonewarning macro. Do not change, unless more zones get added.
 ;	| Discrete zones are: GHZ, LZ, MZ, SLZ, SYZ, and SBZ
