@@ -11,12 +11,12 @@ GotThroughCard:
 Got_Index:	dc.w Got_ChkPLC-Got_Index
 		dc.w Got_Move-Got_Index
 		dc.w Got_Wait-Got_Index
-		dc.w Got_TimeBonus-Got_Index
+		dc.w Got_Bonus-Got_Index
 		dc.w Got_Wait-Got_Index
 		dc.w Got_NextLevel-Got_Index
 		dc.w Got_Wait-Got_Index
-		dc.w Got_Move2-Got_Index
-		dc.w loc_C766-Got_Index
+		dc.w Got_MoveBack-Got_Index
+		dc.w Got_Boundary-Got_Index
 
 got_mainX = objoff_30		; position for card to display on
 got_finalX = objoff_32		; position for card to finish on
@@ -78,7 +78,7 @@ locret_C60E:
 
 loc_C610:
 		move.b	#$E,obRoutine(a0)
-		bra.w	Got_Move2
+		bra.w	Got_MoveBack
 ; ===========================================================================
 
 loc_C61A:
@@ -98,7 +98,8 @@ Got_Display:
 		bra.w	DisplaySprite
 ; ===========================================================================
 
-Got_TimeBonus:	; Routine 6
+; Got_TimeBonus: <- old misnomer
+Got_Bonus:	; Routine 6
 		bsr.w	DisplaySprite
 		move.b	#1,(f_endactbonus).w ; set time/ring bonus update flag
 		moveq	#0,d0
@@ -119,9 +120,9 @@ Got_ChkBonus:
 		move.w	#sfx_Cash,d0
 		jsr	(QueueSound2).l	; play "ker-ching" sound
 		addq.b	#2,obRoutine(a0)
-		cmpi.w	#(id_SBZ<<8)+1,(v_zone).w
-		bne.s	Got_SetDelay
-		addq.b	#4,obRoutine(a0)
+		cmpi.w	#id_SBZ_act2,(v_zone).w	; is level SBZ2?
+		bne.s	Got_SetDelay		; if not, branch
+		addq.b	#4,obRoutine(a0)	; prepare SBZ3 transition cutscene
 
 Got_SetDelay:
 		move.w	#180,obTimeFrame(a0) ; set time delay to 3 seconds
@@ -177,7 +178,8 @@ LevelOrder:
 
 ; ===========================================================================
 
-Got_Move2:	; Routine $E
+; Got_Move2:
+Got_MoveBack:	; Routine $E
 		moveq	#$20,d1		; set horizontal speed
 		move.w	got_finalX(a0),d0
 		cmp.w	obX(a0),d0	; has item reached its finish position?
@@ -207,7 +209,8 @@ Got_SBZ2:
 		jmp	(QueueSound1).l	; play FZ music
 ; ===========================================================================
 
-loc_C766:	; Routine $10
+; loc_C766:
+Got_Boundary:	; Routine $10
 		addq.w	#2,(v_limitright2).w
 		cmpi.w	#$2100,(v_limitright2).w
 		beq.w	DeleteObject

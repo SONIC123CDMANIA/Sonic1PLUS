@@ -69,7 +69,7 @@ Sign_Spin:	; Routine 4
 		bsr.w	FindFreeObj
 		bne.s	.fail
 		_move.b	#id_Rings,obID(a1)	; load rings object
-		move.b	#id_Ring_Sparkle,obRoutine(a1) ; jump to ring sparkle subroutine
+		move.b	#6,obRoutine(a1)	; set to Ring_Sparkle routine
 		move.b	(a2)+,d0
 		ext.w	d0
 		add.w	obX(a0),d0
@@ -128,14 +128,11 @@ loc_EC70:
 
 loc_EC86:
 		addq.b	#2,obRoutine(a0)
-
+		; fall through to GotThroughAct...
 
 ; ---------------------------------------------------------------------------
 ; Subroutine to set up bonuses at the end of an act
 ; ---------------------------------------------------------------------------
-
-; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
-
 
 GotThroughAct:
 		tst.b	(v_endcard).w

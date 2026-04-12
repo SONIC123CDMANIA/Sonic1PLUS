@@ -8,18 +8,13 @@ Rings:
 		move.w	Ring_Index(pc,d0.w),d1
 		jmp	Ring_Index(pc,d1.w)
 ; ===========================================================================
-Ring_Index:
-ptr_Ring_Main:		dc.w Ring_Main-Ring_Index
-ptr_Ring_Animate:	dc.w Ring_Animate-Ring_Index
-ptr_Ring_Collect:	dc.w Ring_Collect-Ring_Index
-ptr_Ring_Sparkle:	dc.w Ring_Sparkle-Ring_Index
-ptr_Ring_Delete:	dc.w Ring_Delete-Ring_Index
+Ring_Index:	dc.w Ring_Main-Ring_Index
+		dc.w Ring_Animate-Ring_Index
+		dc.w Ring_Collect-Ring_Index
+		dc.w Ring_Sparkle-Ring_Index
+		dc.w Ring_Delete-Ring_Index
+; ===========================================================================
 
-id_Ring_Main = ptr_Ring_Main-Ring_Index	; 0
-id_Ring_Animate = ptr_Ring_Animate-Ring_Index	; 2
-id_Ring_Collect = ptr_Ring_Collect-Ring_Index	; 4
-id_Ring_Sparkle = ptr_Ring_Sparkle-Ring_Index	; 6
-id_Ring_Delete = ptr_Ring_Delete-Ring_Index	; 8
 ; ---------------------------------------------------------------------------
 ; Distances between rings (format: horizontal, vertical)
 ; ---------------------------------------------------------------------------
@@ -133,8 +128,10 @@ Ring_Sparkle:	; Routine 6
 Ring_Delete:	; Routine 8
 		bra.w	DeleteObject
 
-; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
-
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Subroutine to add 1 ring, update ring HUD, and maybe add an extra life
+; ---------------------------------------------------------------------------
 
 CollectRing:
 		addq.w	#1,(v_rings).w	; add 1 to rings

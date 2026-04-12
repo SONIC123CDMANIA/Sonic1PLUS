@@ -9,27 +9,18 @@ DrownCount:
 		move.w	Drown_Index(pc,d0.w),d1
 		jmp	Drown_Index(pc,d1.w)
 ; ===========================================================================
-Drown_Index:
-ptr_Drown_Main:		dc.w Drown_Main-Drown_Index
-ptr_Drown_Animate:	dc.w Drown_Animate-Drown_Index
-ptr_Drown_ChkWater:	dc.w Drown_ChkWater-Drown_Index
-ptr_Drown_Display:	dc.w Drown_Display-Drown_Index
-ptr_Drown_Delete:	dc.w Drown_Delete-Drown_Index
-ptr_Drown_Countdown:	dc.w Drown_Countdown-Drown_Index
-ptr_Drown_AirLeft:	dc.w Drown_AirLeft-Drown_Index
-			dc.w Drown_Display-Drown_Index
-			dc.w Drown_Delete-Drown_Index
+Drown_Index:	dc.w Drown_Main-Drown_Index
+		dc.w Drown_Animate-Drown_Index
+		dc.w Drown_ChkWater-Drown_Index
+		dc.w Drown_Display-Drown_Index
+		dc.w Drown_Delete-Drown_Index
+		dc.w Drown_Countdown-Drown_Index
+		dc.w Drown_AirLeft-Drown_Index
+		dc.w Drown_Display-Drown_Index
+		dc.w Drown_Delete-Drown_Index
 
 drown_origX = objoff_30		; original x-axis position
 drown_time = objoff_38		; time between each number changes
-
-id_Drown_Main = ptr_Drown_Main-Drown_Index		; 0
-id_Drown_Animate = ptr_Drown_Animate-Drown_Index		; 2
-id_Drown_ChkWater = ptr_Drown_ChkWater-Drown_Index	; 4
-id_Drown_Display = ptr_Drown_Display-Drown_Index		; 6
-id_Drown_Delete = ptr_Drown_Delete-Drown_Index		; 8
-id_Drown_Countdown = ptr_Drown_Countdown-Drown_Index	; $A
-id_Drown_AirLeft = ptr_Drown_AirLeft-Drown_Index		; $C
 ; ===========================================================================
 
 Drown_Main:	; Routine 0
@@ -64,10 +55,16 @@ Drown_ChkWater:	; Routine 4
 		cmp.w	obY(a0),d0	; has bubble reached the water surface?
 		blo.s	.wobble		; if not, branch
 
-		move.b	#id_Drown_Display,obRoutine(a0) ; goto Drown_Display next
+		move.b	#6,obRoutine(a0) ; goto Drown_Display next
 		addq.b	#7,obAnim(a0)
 		cmpi.b	#$D,obAnim(a0)
+	if FixBugs
+		; fixes a graphical glitch with bubbles hitting the surface
+		bls.s	Drown_Display
+		move.b	#$D,obAnim(a0)
+	else
 		beq.s	Drown_Display
+	endif
 		bra.s	Drown_Display
 ; ===========================================================================
 
@@ -111,7 +108,7 @@ Drown_AirLeft:	; Routine $C
 		bhi.s	Drown_AirLeft_Delete		; if higher than $C, branch
 		subq.w	#1,drown_time(a0)
 		bne.s	.display
-		move.b	#id_Drown_Display+8,obRoutine(a0) ; goto Drown_Display next
+		move.b	#6+8,obRoutine(a0) ; goto Drown_Display next (second one)
 		addq.b	#7,obAnim(a0)
 		bra.s	Drown_Display
 ; ===========================================================================
@@ -146,7 +143,7 @@ Drown_ShowNumber:
 		sub.w	(v_screenposy).w,d0
 		addi.w	#$80,d0
 		move.w	d0,obScreenY(a0)
-		move.b	#id_Drown_AirLeft,obRoutine(a0) ; goto Drown_AirLeft next
+		move.b	#$C,obRoutine(a0) ; goto Drown_AirLeft next
 
 .nonumber:
 		rts
@@ -246,9 +243,8 @@ Drown_Countdown:; Routine $A
 		move.b	#1,(f_nobgscroll).w
 	if FixBugs
 		; Correct Drowning Bugs
-		; https://info.sonicretro.org/SCHG_How-to:Correct_Drowning_Bugs_in_Sonic_1
-		move.b	#$A,obRoutine(a0)	; Force the character to drown
-		move.b	#0,(f_timecount).w	; Stop the timer immediately 
+		move.b	#2,obRoutine(a0)	; make sure Sonic is in his default state (Sonic_Control)
+		clr.b	(f_timecount).w		; also stop the timer immediately to avoid double deaths from Time Overs
 	endif
 		movea.l	(sp)+,a0
 		rts
@@ -256,13 +252,7 @@ Drown_Countdown:; Routine $A
 
 .loc_13F86:
 		subq.w	#1,objoff_2C(a0)
-	if FixBugs
-		; Correct Drowning Bugs
-		; https://info.sonicretro.org/SCHG_How-to:Correct_Drowning_Bugs_in_Sonic_1
-		bne.s	.nochange
-	else
 		bne.s	.loc_13F94
-	endif
 		move.b	#6,(v_player+obRoutine).w
 		rts
 ; ===========================================================================

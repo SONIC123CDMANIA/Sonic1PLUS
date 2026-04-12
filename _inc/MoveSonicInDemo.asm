@@ -2,9 +2,6 @@
 ; Subroutine to move Sonic in demo mode
 ; ---------------------------------------------------------------------------
 
-; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
-
-
 MoveSonicInDemo:
 		tst.w	(f_demo).w	; is demo mode on?
 		bne.s	MDemo_On	; if yes, branch
@@ -12,7 +9,6 @@ MoveSonicInDemo:
 ; ===========================================================================
 
 ; This is an unused subroutine for recording a demo
-
 DemoRecorder:
 		; This was likely intended for a deveveloper cartridge that used RAM instead of ROM.
 		lea	(EndOfRom).l,a1 ; Write past the end of the ROM.
@@ -119,5 +115,4 @@ DemoEndDataPtr:	dc.l Demo_EndGHZ1	; demos run during the credits
 ; Interestingly, this lines up with our knowledge of the fabled
 ; Tokyo Game Show prototype.
 ; See it in action: https://youtu.be/S8_IAfQbUu0
-Demo_Unused:	binclude	"demodata/Unused Demo.bin"
-		even
+Demo_Unused:	include	"demodata/Unused Demo.asm"

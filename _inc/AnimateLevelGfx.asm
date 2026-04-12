@@ -2,9 +2,6 @@
 ; Subroutine to animate level graphics
 ; ---------------------------------------------------------------------------
 
-; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
-
-
 AnimateLevelGfx:
 		tst.w	(f_pause).w	; is the game paused?
 		bne.s	.ispaused	; if yes, branch
@@ -20,11 +17,15 @@ AnimateLevelGfx:
 		rts
 
 ; ===========================================================================
-AniArt_Index:	dc.w AniArt_GHZ-AniArt_Index, AniArt_none-AniArt_Index
-		dc.w AniArt_MZ-AniArt_Index, AniArt_none-AniArt_Index
-		dc.w AniArt_none-AniArt_Index, AniArt_SBZ-AniArt_Index
+AniArt_Index:	dc.w AniArt_GHZ-AniArt_Index	; GHZ
+		dc.w AniArt_none-AniArt_Index	; LZ (unused)
+		dc.w AniArt_MZ-AniArt_Index	; MZ
+		dc.w AniArt_none-AniArt_Index	; SLZ (unused)
+		dc.w AniArt_none-AniArt_Index	; SYZ (unused)
+		dc.w AniArt_SBZ-AniArt_Index	; SBZ
 		zonewarning AniArt_Index,2
-		dc.w AniArt_Ending-AniArt_Index
+		dc.w AniArt_Ending-AniArt_Index	; ending sequence
+
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Animated pattern routine - Green Hill
@@ -283,7 +284,7 @@ AniArt_Ending_BigFlower:
 		
 		move.b	#8-1,(v_lani1_time).w
 		lea	(Art_GhzFlower1).l,a1 ; load big flower patterns
-		lea	(v_256x256_end-$1000).w,a2 ; load 2nd big flower from RAM
+		lea	(v_256x256+$4A*chunk_size).w,a2 ; load 2nd big flower from RAM (overwriting unused chunk RAM)
 		move.b	(v_lani1_frame).w,d0
 		addq.b	#1,(v_lani1_frame).w ; increment frame counter
 		andi.w	#1,d0		; only 2 frames
@@ -341,7 +342,7 @@ AniArt_Ending_Flower3:
 		lsl.w	#8,d0		; multiply by $100
 		add.w	d0,d0		; multiply by 2
 		locVRAM	ArtTile_GHZ_Flower_3*tile_size
-		lea	(v_256x256_end-$1000+$400).w,a1 ; load special flower patterns (from RAM)
+		lea	(v_256x256+$4C*chunk_size).w,a1 ; load special flower patterns from RAM (overwriting unused chunk RAM)
 		lea	(a1,d0.w),a1	; jump to appropriate tile
 		move.w	#.size-1,d1
 		bra.w	LoadTiles
@@ -364,7 +365,7 @@ AniArt_Ending_Flower4:
 		lsl.w	#8,d0		; multiply by $100
 		add.w	d0,d0		; multiply by 2
 		locVRAM	ArtTile_GHZ_Flower_4*tile_size
-		lea	(v_256x256_end-$1000+$A00).w,a1 ; load special flower patterns (from RAM)
+		lea	(v_256x256+$4F*chunk_size).w,a1 ; load special flower patterns from RAM (overwriting unused chunk RAM)
 		lea	(a1,d0.w),a1	; jump to appropriate tile
 		move.w	#.size-1,d1
 		bra.w	LoadTiles
@@ -377,6 +378,7 @@ AniArt_Ending_Flower4:
 AniArt_none:
 		rts
 
+; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Subroutine to transfer graphics to VRAM
 
@@ -385,8 +387,6 @@ AniArt_none:
 ; a6 = vdp_data_port ($C00000)
 ; d1 = number of tiles to load (minus one)
 ; ---------------------------------------------------------------------------
-
-; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
 
 
 LoadTiles:
@@ -406,158 +406,180 @@ LoadTiles:
 ; ---------------------------------------------------------------------------
 ; Animated pattern routine - more Marble Zone
 ; ---------------------------------------------------------------------------
-AniArt_MZextra:	dc.w loc_1C3EE-AniArt_MZextra, loc_1C3FA-AniArt_MZextra
-		dc.w loc_1C410-AniArt_MZextra, loc_1C41E-AniArt_MZextra
-		dc.w loc_1C434-AniArt_MZextra, loc_1C442-AniArt_MZextra
-		dc.w loc_1C458-AniArt_MZextra, loc_1C466-AniArt_MZextra
-		dc.w loc_1C47C-AniArt_MZextra, loc_1C48A-AniArt_MZextra
-		dc.w loc_1C4A0-AniArt_MZextra, loc_1C4AE-AniArt_MZextra
-		dc.w loc_1C4C4-AniArt_MZextra, loc_1C4D2-AniArt_MZextra
-		dc.w loc_1C4E8-AniArt_MZextra, loc_1C4FA-AniArt_MZextra
+AniArt_MZextra:	dc.w AniArt_MZ_Magma_Shift0_Col0-AniArt_MZextra
+		dc.w AniArt_MZ_Magma_Shift1_Col0-AniArt_MZextra
+		dc.w AniArt_MZ_Magma_Shift2_Col0-AniArt_MZextra
+		dc.w AniArt_MZ_Magma_Shift3_Col0-AniArt_MZextra
+		dc.w AniArt_MZ_Magma_Shift0_Col1-AniArt_MZextra
+		dc.w AniArt_MZ_Magma_Shift1_Col1-AniArt_MZextra
+		dc.w AniArt_MZ_Magma_Shift2_Col1-AniArt_MZextra
+		dc.w AniArt_MZ_Magma_Shift3_Col1-AniArt_MZextra
+		dc.w AniArt_MZ_Magma_Shift0_Col2-AniArt_MZextra
+		dc.w AniArt_MZ_Magma_Shift1_Col2-AniArt_MZextra
+		dc.w AniArt_MZ_Magma_Shift2_Col2-AniArt_MZextra
+		dc.w AniArt_MZ_Magma_Shift3_Col2-AniArt_MZextra
+		dc.w AniArt_MZ_Magma_Shift0_Col3-AniArt_MZextra
+		dc.w AniArt_MZ_Magma_Shift1_Col3-AniArt_MZextra
+		dc.w AniArt_MZ_Magma_Shift2_Col3-AniArt_MZextra
+		dc.w AniArt_MZ_Magma_Shift3_Col3-AniArt_MZextra
 ; ===========================================================================
 
-loc_1C3EE:
+; loc_1C3EE:
+AniArt_MZ_Magma_Shift0_Col0:
 		move.l	(a1),(a6)
 		lea	$10(a1),a1
-		dbf	d1,loc_1C3EE
+		dbf	d1,AniArt_MZ_Magma_Shift0_Col0
 		rts
 ; ===========================================================================
 
-loc_1C3FA:
+; loc_1C3FA:
+AniArt_MZ_Magma_Shift1_Col0:
 		move.l	2(a1),d0
 		move.b	1(a1),d0
 		ror.l	#8,d0
 		move.l	d0,(a6)
 		lea	$10(a1),a1
-		dbf	d1,loc_1C3FA
+		dbf	d1,AniArt_MZ_Magma_Shift1_Col0
 		rts
 ; ===========================================================================
 
-loc_1C410:
+; loc_1C410:
+AniArt_MZ_Magma_Shift2_Col0:
 		move.l	2(a1),(a6)
 		lea	$10(a1),a1
-		dbf	d1,loc_1C410
+		dbf	d1,AniArt_MZ_Magma_Shift2_Col0
 		rts
 ; ===========================================================================
 
-loc_1C41E:
+; loc_1C41E:
+AniArt_MZ_Magma_Shift3_Col0:
 		move.l	4(a1),d0
 		move.b	3(a1),d0
 		ror.l	#8,d0
 		move.l	d0,(a6)
 		lea	$10(a1),a1
-		dbf	d1,loc_1C41E
+		dbf	d1,AniArt_MZ_Magma_Shift3_Col0
 		rts
 ; ===========================================================================
 
-loc_1C434:
+; loc_1C434:
+AniArt_MZ_Magma_Shift0_Col1:
 		move.l	4(a1),(a6)
 		lea	$10(a1),a1
-		dbf	d1,loc_1C434
+		dbf	d1,AniArt_MZ_Magma_Shift0_Col1
 		rts
 ; ===========================================================================
 
-loc_1C442:
+; loc_1C442:
+AniArt_MZ_Magma_Shift1_Col1:
 		move.l	6(a1),d0
 		move.b	5(a1),d0
 		ror.l	#8,d0
 		move.l	d0,(a6)
 		lea	$10(a1),a1
-		dbf	d1,loc_1C442
+		dbf	d1,AniArt_MZ_Magma_Shift1_Col1
 		rts
 ; ===========================================================================
 
-loc_1C458:
+; loc_1C458:
+AniArt_MZ_Magma_Shift2_Col1:
 		move.l	6(a1),(a6)
 		lea	$10(a1),a1
-		dbf	d1,loc_1C458
+		dbf	d1,AniArt_MZ_Magma_Shift2_Col1
 		rts
 ; ===========================================================================
 
-loc_1C466:
+; loc_1C466:
+AniArt_MZ_Magma_Shift3_Col1:
 		move.l	8(a1),d0
 		move.b	7(a1),d0
 		ror.l	#8,d0
 		move.l	d0,(a6)
 		lea	$10(a1),a1
-		dbf	d1,loc_1C466
+		dbf	d1,AniArt_MZ_Magma_Shift3_Col1
 		rts
 ; ===========================================================================
 
-loc_1C47C:
+; loc_1C47C:
+AniArt_MZ_Magma_Shift0_Col2:
 		move.l	8(a1),(a6)
 		lea	$10(a1),a1
-		dbf	d1,loc_1C47C
+		dbf	d1,AniArt_MZ_Magma_Shift0_Col2
 		rts
 ; ===========================================================================
 
-loc_1C48A:
+; loc_1C48A:
+AniArt_MZ_Magma_Shift1_Col2:
 		move.l	$A(a1),d0
 		move.b	9(a1),d0
 		ror.l	#8,d0
 		move.l	d0,(a6)
 		lea	$10(a1),a1
-		dbf	d1,loc_1C48A
+		dbf	d1,AniArt_MZ_Magma_Shift1_Col2
 		rts
 ; ===========================================================================
 
-loc_1C4A0:
+; loc_1C4A0:
+AniArt_MZ_Magma_Shift2_Col2:
 		move.l	$A(a1),(a6)
 		lea	$10(a1),a1
-		dbf	d1,loc_1C4A0
+		dbf	d1,AniArt_MZ_Magma_Shift2_Col2
 		rts
 ; ===========================================================================
 
-loc_1C4AE:
+; loc_1C4AE:
+AniArt_MZ_Magma_Shift3_Col2:
 		move.l	$C(a1),d0
 		move.b	$B(a1),d0
 		ror.l	#8,d0
 		move.l	d0,(a6)
 		lea	$10(a1),a1
-		dbf	d1,loc_1C4AE
+		dbf	d1,AniArt_MZ_Magma_Shift3_Col2
 		rts
 ; ===========================================================================
 
-loc_1C4C4:
+; loc_1C4C4:
+AniArt_MZ_Magma_Shift0_Col3:
 		move.l	$C(a1),(a6)
 		lea	$10(a1),a1
-		dbf	d1,loc_1C4C4
+		dbf	d1,AniArt_MZ_Magma_Shift0_Col3
 		rts
 ; ===========================================================================
 
-loc_1C4D2:
+; loc_1C4D2:
+AniArt_MZ_Magma_Shift1_Col3:
 		move.l	$C(a1),d0
 		rol.l	#8,d0
 		_move.b	0(a1),d0
 		move.l	d0,(a6)
 		lea	$10(a1),a1
-		dbf	d1,loc_1C4D2
+		dbf	d1,AniArt_MZ_Magma_Shift1_Col3
 		rts
 ; ===========================================================================
 
-loc_1C4E8:
+; loc_1C4E8:
+AniArt_MZ_Magma_Shift2_Col3:
 		move.w	$E(a1),(a6)
 		_move.w	0(a1),(a6)
 		lea	$10(a1),a1
-		dbf	d1,loc_1C4E8
+		dbf	d1,AniArt_MZ_Magma_Shift2_Col3
 		rts
 ; ===========================================================================
 
-loc_1C4FA:
+; loc_1C4FA:
+AniArt_MZ_Magma_Shift3_Col3:
 		_move.l	0(a1),d0
 		move.b	$F(a1),d0
 		ror.l	#8,d0
 		move.l	d0,(a6)
 		lea	$10(a1),a1
-		dbf	d1,loc_1C4FA
+		dbf	d1,AniArt_MZ_Magma_Shift3_Col3
 		rts
 
+; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Animated pattern routine - giant ring
 ; ---------------------------------------------------------------------------
-
-; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
-
 
 AniArt_GiantRing:
 

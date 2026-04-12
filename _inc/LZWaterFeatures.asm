@@ -269,12 +269,10 @@ DynWater_SBZ3:
 		move.w	d1,(v_waterpos3).w
 		rts
 
+; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Labyrinth Zone "wind tunnels" subroutine
 ; ---------------------------------------------------------------------------
-
-; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
-
 
 LZWindTunnels:
 		tst.w	(v_debuguse).w	; is debug mode being used?
@@ -332,7 +330,7 @@ LZWindTunnels:
 		cmp.w	(a2),d0
 		bhs.s	.movesonic
 		moveq	#2,d0
-		cmpi.b	#1,(v_act).w	; is act number 2?
+		cmpi.b	#act2,(v_act).w	; is act number 2?
 		bne.s	.notact2	; if not, branch
 		neg.w	d0
 
@@ -382,12 +380,10 @@ LZWind_Data:	dc.w $A80, $300, $C10,  $380 ; act 1 values (set 1)
 		dc.w $C80, $600, $13D0, $680 ; SBZ act 3 values
 		even
 
+; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Labyrinth Zone water slide subroutine
 ; ---------------------------------------------------------------------------
-
-; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
-
 
 LZWaterSlides:
 		lea	(v_player).w,a1

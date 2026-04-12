@@ -2,9 +2,6 @@
 ; Palette cycling routine loading subroutine
 ; ---------------------------------------------------------------------------
 
-; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
-
-
 PaletteCycle:
 		moveq	#0,d2
 		moveq	#0,d0
@@ -26,10 +23,7 @@ PalCycle_Index:	dc.w PalCycle_GHZ-PalCycle_Index
 		dc.w PalCycle_SBZ-PalCycle_Index
 		zonewarning PalCycle_Index,2
 		dc.w PalCycle_GHZ-PalCycle_Index	; Ending
-
-
-; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
-
+; ===========================================================================
 
 PalCycle_Title:
 		lea	(Pal_TitleCyc).l,a0
@@ -55,10 +49,7 @@ PCycGHZ_Go:
 PCycGHZ_Skip:
 		rts
 ; End of function PalCycle_GHZ
-
-
-; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
-
+; ===========================================================================
 
 PalCycle_LZ:
 ; Waterfalls
@@ -71,7 +62,7 @@ PalCycle_LZ:
 		andi.w	#3,d0		; if cycle > 3, reset to 0
 		lsl.w	#3,d0
 		lea	(Pal_LZCyc1).l,a0
-		cmpi.b	#3,(v_act).w	; check if level is SBZ3
+		cmpi.b	#act4,(v_act).w	; check if on act 4 (SBZ3)
 		bne.s	PCycLZ_NotSBZ3
 		lea	(Pal_SBZ3Cyc).l,a0 ; load SBZ3 palette instead
 
@@ -131,9 +122,7 @@ PCycLZ_Seq:	dc.b 1,	0, 0, 1, 0, 0, 1, 0
 
 PalCycle_MZ:
 		rts
-
-; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
-
+; ===========================================================================
 
 PalCycle_SLZ:
 		subq.w	#1,(v_pcyc_time).w
@@ -159,10 +148,7 @@ loc_1A60:
 locret_1A80:
 		rts
 ; End of function PalCycle_SLZ
-
-
-; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
-
+; ===========================================================================
 
 PalCycle_SYZ:
 		subq.w	#1,(v_pcyc_time).w
@@ -186,10 +172,7 @@ PalCycle_SYZ:
 locret_1AC6:
 		rts
 ; End of function PalCycle_SYZ
-
-
-; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
-
+; ===========================================================================
 
 PalCycle_SBZ:
 		lea	(Pal_SBZCycList1).l,a2
@@ -264,3 +247,75 @@ loc_1B52:
 locret_1B64:
 		rts
 ; End of function PalCycle_SBZ
+
+
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Palette cycle data bincludes
+; ---------------------------------------------------------------------------
+
+Pal_TitleCyc:	binclude	"palette/Cycle - Title Screen Water.bin"
+Pal_GHZCyc:	binclude	"palette/Cycle - GHZ.bin"
+Pal_LZCyc1:	binclude	"palette/Cycle - LZ Waterfall.bin"
+Pal_LZCyc2:	binclude	"palette/Cycle - LZ Conveyor Belt.bin"
+Pal_LZCyc3:	binclude	"palette/Cycle - LZ Conveyor Belt Underwater.bin"
+Pal_SBZ3Cyc:	binclude	"palette/Cycle - SBZ3 Waterfall.bin"
+Pal_MZCyc:	binclude	"palette/Cycle - MZ (Unused).bin"
+Pal_SLZCyc:	binclude	"palette/Cycle - SLZ.bin"
+Pal_SYZCyc1:	binclude	"palette/Cycle - SYZ1.bin"
+Pal_SYZCyc2:	binclude	"palette/Cycle - SYZ2.bin"
+
+
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Scrap Brain Zone palette cycling script
+; ---------------------------------------------------------------------------
+
+mSBZh:	macro {INTLABEL},{GLOBALSYMBOLS}
+__LABEL__:	dc.w ((__LABEL___end-__LABEL__-2)/6)-1
+		endm
+
+mSBZp:	macro duration,colours,sourceAddress,destinationPaletteIndex
+		dc.b duration, colours
+		dc.w sourceAddress, v_palette+destinationPaletteIndex*2
+		endm
+
+; duration in frames, number of colours, palette address, RAM address
+Pal_SBZCycList1: mSBZh
+		mSBZp	 7, 8,Pal_SBZCyc1,$28
+		mSBZp	13, 8,Pal_SBZCyc2,$29
+		mSBZp	14, 8,Pal_SBZCyc3,$37
+		mSBZp	11, 8,Pal_SBZCyc5,$38
+		mSBZp	 7, 8,Pal_SBZCyc6,$39
+		mSBZp	28,16,Pal_SBZCyc7,$3F
+		mSBZp	 3, 3,Pal_SBZCyc8,$3C
+		mSBZp	 3, 3,Pal_SBZCyc8+2,$3D
+		mSBZp	 3, 3,Pal_SBZCyc8+4,$3E
+Pal_SBZCycList1_end:
+		even
+
+Pal_SBZCycList2: mSBZh
+		mSBZp	 7, 8,Pal_SBZCyc1,$28
+		mSBZp	13, 8,Pal_SBZCyc2,$29
+		mSBZp	 9, 8,Pal_SBZCyc9,$38
+		mSBZp	 7, 8,Pal_SBZCyc6,$39
+		mSBZp	 3, 3,Pal_SBZCyc8,$3C
+		mSBZp	 3, 3,Pal_SBZCyc8+2,$3D
+		mSBZp	 3, 3,Pal_SBZCyc8+4,$3E
+Pal_SBZCycList2_end:
+		even
+
+; ---------------------------------------------------------------------------
+; SBZ palette cycle data bincludes
+; ---------------------------------------------------------------------------
+
+Pal_SBZCyc1:	binclude	"palette/Cycle - SBZ 1.bin"
+Pal_SBZCyc2:	binclude	"palette/Cycle - SBZ 2.bin"
+Pal_SBZCyc3:	binclude	"palette/Cycle - SBZ 3.bin"
+Pal_SBZCyc4:	binclude	"palette/Cycle - SBZ 4.bin"
+Pal_SBZCyc5:	binclude	"palette/Cycle - SBZ 5.bin"
+Pal_SBZCyc6:	binclude	"palette/Cycle - SBZ 6.bin"
+Pal_SBZCyc7:	binclude	"palette/Cycle - SBZ 7.bin"
+Pal_SBZCyc8:	binclude	"palette/Cycle - SBZ 8.bin"
+Pal_SBZCyc9:	binclude	"palette/Cycle - SBZ 9.bin"
+Pal_SBZCyc10:	binclude	"palette/Cycle - SBZ 10.bin"
