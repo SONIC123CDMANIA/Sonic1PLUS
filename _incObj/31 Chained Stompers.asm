@@ -73,7 +73,7 @@ CStom_MakeStomper:
 		add.w	obY(a0),d0
 		move.w	d0,obY(a1)
 		move.l	#Map_CStom,obMap(a1)
-		move.w	#make_art_tile(ArtTile_MZ_Spike_Stomper,0,0),obGfx(a1)
+		move.w	#ArtTile_MZ_Spike_Stomper,obGfx(a1)
 		move.b	#4,obRender(a1)
 		move.w	obY(a1),objoff_30(a1)
 		move.b	obSubtype(a0),obSubtype(a1)
@@ -205,7 +205,7 @@ CStom_Type00:
 loc_B872:
 		tst.w	objoff_32(a0)
 		beq.s	loc_B8A0
-		move.b	(v_vbla_byte).w,d0
+		move.b	(v_vblank_byte).w,d0
 		andi.b	#$F,d0
 		bne.s	loc_B892
 		tst.b	obRender(a0)
@@ -257,7 +257,7 @@ CStom_Type01:
 ; ===========================================================================
 
 loc_B902:
-		move.b	(v_vbla_byte).w,d0
+		move.b	(v_vblank_byte).w,d0
 		andi.b	#$F,d0
 		bne.s	loc_B91C
 		tst.b	obRender(a0)

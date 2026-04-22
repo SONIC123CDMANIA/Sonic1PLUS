@@ -22,17 +22,17 @@ BossFinal_Index:
 		dc.w BossFinal_Flame-BossFinal_Index
 
 BossFinal_ObjData:
-		dc.w $100, $100, make_art_tile(ArtTile_FZ_Eggman_No_Vehicle,0,0)	; X pos, Y pos, VRAM setting
+		dc.w $100, $100, ArtTile_FZ_Eggman_No_Vehicle	; X pos, Y pos, VRAM setting
 		dc.l Map_SEgg		; mappings pointer
-		dc.w boss_fz_x+$160, boss_fz_y+$80, make_art_tile(ArtTile_FZ_Boss,0,0)
+		dc.w boss_fz_x+$160, boss_fz_y+$80, ArtTile_FZ_Boss
 		dc.l Map_EggCyl
-		dc.w boss_fz_x+$290, boss_fz_y+$86, make_art_tile(ArtTile_FZ_Eggman_Fleeing,0,0)
+		dc.w boss_fz_x+$290, boss_fz_y+$86, ArtTile_FZ_Eggman_Fleeing
 		dc.l Map_FZLegs
-		dc.w boss_fz_x+$290, boss_fz_y+$86, make_art_tile(ArtTile_FZ_Eggman_No_Vehicle,0,0)
+		dc.w boss_fz_x+$290, boss_fz_y+$86, ArtTile_FZ_Eggman_No_Vehicle
 		dc.l Map_SEgg
-		dc.w boss_fz_x+$290, boss_fz_y+$86, make_art_tile(ArtTile_Eggman,0,0)
+		dc.w boss_fz_x+$290, boss_fz_y+$86, ArtTile_Eggman
 		dc.l Map_Eggman
-		dc.w boss_fz_x+$290, boss_fz_y+$86, make_art_tile(ArtTile_Eggman,0,0)
+		dc.w boss_fz_x+$290, boss_fz_y+$86, ArtTile_Eggman
 		dc.l Map_Eggman
 
 BossFinal_ObjData2:
@@ -275,7 +275,7 @@ BossFinal_Eggman_Plasma:
 
 loc_1A000:
 		moveq	#$F,d0
-		and.w	(v_vbla_word).w,d0
+		and.w	(v_vblank_word).w,d0
 		bne.s	loc_1A00A
 		bsr.s	loc_1A020
 
@@ -424,7 +424,7 @@ locret_1A190:
 ; loc_1A192:
 BossFinal_Eggman_Ship:
 		move.l	#Map_Eggman,obMap(a0)
-		move.w	#make_art_tile(ArtTile_Eggman,0,0),obGfx(a0)
+		move.w	#ArtTile_Eggman,obGfx(a0)
 		move.b	#0,obAnim(a0)
 		bset	#0,obStatus(a0)
 		jsr	(SpeedToPos).l
@@ -466,12 +466,12 @@ loc_1A210:
 loc_1A216:
 		cmpi.w	#boss_fz_end+$90,(v_player+obX).w
 		blt.s	loc_1A23A
-		move.b	#1,(f_lockctrl).w
-		move.w	#0,(v_jpadhold2).w
-		clr.w	(v_player+obInertia).w
-		tst.w	obVelY(a0)
-		bpl.s	loc_1A248
-		move.w	#btnUp<<8,(v_jpadhold2).w
+		move.b	#1,(f_lockctrl).w	; lock controls
+		move.w	#0,(v_jpadhold2).w	; clear button inputs
+		clr.w	(v_player+obInertia).w	; stop Sonic moving
+		tst.w	obVelY(a0)		; is Eggman going down?
+		bpl.s	loc_1A248		; if yes, branch
+		move.w	#btnUp<<8,(v_jpadhold2).w ; make Sonic look up if Eggman got away
 
 loc_1A23A:
 		cmpi.w	#boss_fz_end+$E0,(v_player+obX).w
@@ -545,7 +545,7 @@ loc_1A2E4:
 		ble.s	loc_1A312
 		move.b	#6,obAnim(a0)
 		move.l	#Map_Eggman,obMap(a0)
-		move.w	#make_art_tile(ArtTile_Eggman,0,0),obGfx(a0)
+		move.w	#ArtTile_Eggman,obGfx(a0)
 		lea	Ani_Eggman(pc),a1
 		jsr	(AnimateSprite).l
 		bra.w	loc_1A296
@@ -558,7 +558,7 @@ loc_1A312:
 		move.b	#2,obPriority(a0)
 		move.b	#0,obAnim(a0)
 		move.l	#Map_FZDamaged,obMap(a0)
-		move.w	#make_art_tile(ArtTile_FZ_Eggman_Fleeing,0,0),obGfx(a0)
+		move.w	#ArtTile_FZ_Eggman_Fleeing,obGfx(a0)
 		lea	Ani_FZEgg(pc),a1
 		jsr	(AnimateSprite).l
 		bra.w	loc_1A296

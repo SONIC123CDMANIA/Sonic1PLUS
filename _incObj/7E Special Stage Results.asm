@@ -45,7 +45,7 @@ SSR_Loop:
 		move.b	(a2)+,obRoutine(a1)
 		move.b	(a2)+,obFrame(a1)
 		move.l	#Map_SSR,obMap(a1)
-		move.w	#make_art_tile(ArtTile_Title_Card,0,1),obGfx(a1)
+		move.w	#ArtTile_Title_Card|Tile_Prio,obGfx(a1)
 		move.b	#0,obRender(a1)
 		lea	object_size(a1),a1
 		dbf	d1,SSR_Loop	; repeat sequence 3 or 4 times
@@ -110,7 +110,7 @@ SSR_RingBonus:	; Routine 6
 		subi.w	#10,(v_ringbonus).w ; subtract 10 from ring bonus
 		moveq	#10,d0		; add 10 to score
 		jsr	(AddPoints).l
-		move.b	(v_vbla_byte).w,d0
+		move.b	(v_vblank_byte).w,d0
 		andi.b	#3,d0
 		bne.s	locret_C8EA
 		move.w	#sfx_Switch,d0
@@ -148,7 +148,7 @@ SSR_Continue:	; Routine $E
 
 ; loc_C91A:
 SSR_ContAni:	; Routine $14
-		move.b	(v_vbla_byte).w,d0
+		move.b	(v_vblank_byte).w,d0
 		andi.b	#$F,d0
 		bne.s	SSR_Display2
 		bchg	#0,obFrame(a0)

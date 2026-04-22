@@ -16,8 +16,8 @@ Pause_StopGame:
 		move.b	#1,(v_snddriver_ram.f_pausemusic).w ; pause music
 
 Pause_Loop:
-		move.b	#$10,(v_vbla_routine).w
-		bsr.w	WaitForVBla
+		move.b	#id_VBlank_Paused,(v_vblank_routine).w
+		bsr.w	WaitForVBlank
 		tst.b	(f_slomocheat).w ; is slow-motion cheat on?
 		beq.s	Pause_ChkStart	; if not, branch
 		btst	#bitA,(v_jpadpress1).w ; is button A pressed?
@@ -28,7 +28,7 @@ Pause_Loop:
 ; ===========================================================================
 
 Pause_ChkBC:
-		btst	#bitB,(v_jpadhold1).w ; is button B pressed?
+		btst	#bitB,(v_jpadhold1).w ; is button B held?
 		bne.s	Pause_SlowMo	; if yes, branch
 		btst	#bitC,(v_jpadpress1).w ; is button C pressed?
 		bne.s	Pause_SlowMo	; if yes, branch

@@ -19,7 +19,7 @@ pole_grabbed = objoff_32		; flag set when Sonic grabs the pole
 Pole_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Pole,obMap(a0)
-		move.w	#make_art_tile(ArtTile_LZ_Pole,2,0),obGfx(a0)
+		move.w	#ArtTile_LZ_Pole|Tile_Pal3,obGfx(a0)
 		move.b	#4,obRender(a0)
 		move.b	#8,obActWid(a0)
 		move.b	#4,obPriority(a0)
@@ -44,7 +44,7 @@ Pole_Action:	; Routine 2
 		lea	(v_player).w,a1
 		move.w	obY(a0),d0
 		subi.w	#$18,d0
-		btst	#bitUp,(v_jpadhold1).w ; is "up" pressed?
+		btst	#bitUp,(v_jpadhold1).w ; is "up" held?
 		beq.s	.movedown	; if not, branch
 		subq.w	#1,obY(a1)	; move Sonic up
 		cmp.w	obY(a1),d0
@@ -53,7 +53,7 @@ Pole_Action:	; Routine 2
 
 .movedown:
 		addi.w	#$24,d0
-		btst	#bitDn,(v_jpadhold1).w ; is "down" pressed?
+		btst	#bitDn,(v_jpadhold1).w ; is "down" held?
 		beq.s	.letgo		; if not, branch
 		addq.w	#1,obY(a1)	; move Sonic down
 		cmp.w	obY(a1),d0

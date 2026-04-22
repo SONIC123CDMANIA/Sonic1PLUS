@@ -29,7 +29,7 @@ BossSpikeball_Index:
 
 BossSpikeball_Main:	; Routine 0
 		move.l	#Map_SSawBall,obMap(a0)
-		move.w	#make_art_tile(ArtTile_Eggman_Spikeball,0,0),obGfx(a0)
+		move.w	#ArtTile_Eggman_Spikeball,obGfx(a0)
 		move.b	#1,obFrame(a0)
 		ori.b	#4,obRender(a0)
 		move.b	#4,obPriority(a0)
@@ -336,7 +336,7 @@ BossSpikeball_BallHitbox:
 ; ===========================================================================
 
 BossSpikeball_Explode:	; Routine 8
-		move.b	#id_ExplosionBomb,obID(a0)
+		move.b	#id_Explosion,obID(a0)
 		clr.b	obRoutine(a0)
 		cmpi.w	#$20,obSubtype(a0)
 		beq.s	BossSpikeball_MakeFrag
@@ -355,7 +355,7 @@ BossSpikeball_Loop:
 		move.b	#$A,obRoutine(a1)
 		move.l	#Map_BSBall,obMap(a1)
 		move.b	#3,obPriority(a1)
-		move.w	#make_art_tile(ArtTile_Eggman_Spikeball,0,0),obGfx(a1)
+		move.w	#ArtTile_Eggman_Spikeball,obGfx(a1)
 		move.w	obX(a0),obX(a1)
 		move.w	obY(a0),obY(a1)
 		move.w	(a2)+,obVelX(a1)
@@ -383,7 +383,7 @@ BossSpikeball_MoveFrag:	; Routine $A
 		move.w	obY(a0),objoff_34(a0)
 		addi.w	#$18,obVelY(a0)
 		moveq	#4,d0
-		and.w	(v_vbla_word).w,d0
+		and.w	(v_vblank_word).w,d0
 		lsr.w	#2,d0
 		move.b	d0,obFrame(a0)
 		tst.b	obRender(a0)

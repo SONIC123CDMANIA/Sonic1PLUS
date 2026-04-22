@@ -32,7 +32,7 @@ Pri_Var:	dc.b 2,	$20, 4,	0	; routine, width, priority, frame
 
 Pri_Main:	; Routine 0
 		move.l	#Map_Pri,obMap(a0)
-		move.w	#make_art_tile(ArtTile_Prison_Capsule,0,0),obGfx(a0)
+		move.w	#ArtTile_Prison_Capsule,obGfx(a0)
 		move.b	#4,obRender(a0)
 		move.w	obY(a0),pri_origY(a0)
 		moveq	#0,d0
@@ -104,11 +104,11 @@ Pri_Switched:	; Routine 4
 
 Pri_Explosion:	; Routine 6, 8, $A
 		moveq	#7,d0
-		and.b	(v_vbla_byte).w,d0
+		and.b	(v_vblank_byte).w,d0
 		bne.s	.noexplosion
 		jsr	(FindFreeObj).l
 		bne.s	.noexplosion
-		_move.b	#id_ExplosionBomb,obID(a1) ; load explosion object
+		_move.b	#id_Explosion,obID(a1) ; load explosion object
 		move.w	obX(a0),obX(a1)
 		move.w	obY(a0),obY(a1)
 		jsr	(RandomNumber).l
@@ -155,7 +155,7 @@ Pri_Explosion:	; Routine 6, 8, $A
 
 Pri_Animals:	; Routine $C
 		moveq	#7,d0
-		and.b	(v_vbla_byte).w,d0
+		and.b	(v_vblank_byte).w,d0
 		bne.s	.noanimal
 		jsr	(FindFreeObj).l
 		bne.s	.noanimal

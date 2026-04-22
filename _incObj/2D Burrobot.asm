@@ -19,7 +19,7 @@ Burro_Main:	; Routine 0
 		move.b	#$13,obHeight(a0)
 		move.b	#8,obWidth(a0)
 		move.l	#Map_Burro,obMap(a0)
-		move.w	#make_art_tile(ArtTile_Burrobot,0,0),obGfx(a0)
+		move.w	#ArtTile_Burrobot,obGfx(a0)
 		ori.b	#4,obRender(a0)
 		move.b	#4,obPriority(a0)
 		move.b	#5,obColType(a0)
@@ -83,7 +83,7 @@ loc_AD78:
 ; ===========================================================================
 
 loc_AD84:
-		btst	#2,(v_vbla_byte).w
+		btst	#2,(v_vblank_byte).w
 		beq.s	loc_ADA4
 		subq.b	#2,ob2ndRout(a0)
 		move.w	#59,burro_timedelay(a0)

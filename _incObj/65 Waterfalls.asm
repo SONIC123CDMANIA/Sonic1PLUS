@@ -18,7 +18,7 @@ WFall_Index:	dc.w WFall_Main-WFall_Index
 WFall_Main:	; Routine 0
 		addq.b	#4,obRoutine(a0)
 		move.l	#Map_WFall,obMap(a0)
-		move.w	#make_art_tile(ArtTile_LZ_Splash,2,0),obGfx(a0)
+		move.w	#ArtTile_LZ_Splash|Tile_Pal3,obGfx(a0)
 		ori.b	#4,obRender(a0)
 		move.b	#$18,obActWid(a0)
 		move.b	#1,obPriority(a0)
@@ -61,10 +61,10 @@ WFall_OnWater:	; Routine 6
 
 ; loc_12B36:
 WFall_Priority:	; Routine 8
-		bclr	#7,obGfx(a0)
-		cmpi.b	#7,(v_lvllayout+$80*2+6).w
-		bne.s	.animate
-		bset	#7,obGfx(a0)
+		bclr	#7,obGfx(a0)	; render waterfall object on low-plane
+		cmpi.b	#7,(v_lvllayout_fg+((layout_row*2)+6)).w ; is water slide layout currently altered?
+		bne.s	.animate	; if not, branch
+		bset	#7,obGfx(a0)	; render waterfall object on high-plane
 
 .animate:
 		bra.s	WFall_Animate

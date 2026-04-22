@@ -15,7 +15,7 @@ Bas_Index:	dc.w Bas_Main-Bas_Index
 Bas_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Bas,obMap(a0)
-		move.w	#make_art_tile(ArtTile_Basaran,0,1),obGfx(a0)
+		move.w	#ArtTile_Basaran|Tile_Prio,obGfx(a0)
 		move.b	#4,obRender(a0)
 		move.b	#$C,obHeight(a0)
 		move.b	#2,obPriority(a0)
@@ -50,7 +50,7 @@ Bas_Action:	; Routine 2
 		tst.w	(v_debuguse).w	; is debug mode on?
 		bne.s	.nodrop		; if yes, branch
 
-		move.b	(v_vbla_byte).w,d0
+		move.b	(v_vblank_byte).w,d0
 		add.b	d7,d0
 		andi.b	#7,d0
 		bne.s	.nodrop
@@ -95,7 +95,7 @@ Bas_Action:	; Routine 2
 ; ===========================================================================
 
 .flapsound:
-		move.b	(v_vbla_byte).w,d0
+		move.b	(v_vblank_byte).w,d0
 		andi.b	#$F,d0
 		bne.s	.nosound
 		move.w	#sfx_Basaran,d0
@@ -111,7 +111,7 @@ Bas_Action:	; Routine 2
 .isright:
 		cmpi.w	#$80,d0		; is Sonic within $80 pixels of basaran?
 		blo.s	.dontflyup	; if yes, branch
-		move.b	(v_vbla_byte).w,d0
+		move.b	(v_vblank_byte).w,d0
 		add.b	d7,d0
 		andi.b	#7,d0
 		bne.s	.dontflyup

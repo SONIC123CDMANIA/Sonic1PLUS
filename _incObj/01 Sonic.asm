@@ -31,7 +31,7 @@ Sonic_Main:	; Routine 0
 		move.b	#$13,obHeight(a0)			; set default height
 		move.b	#9,obWidth(a0)				; set default width
 		move.l	#Map_Sonic,obMap(a0)			; set mappings
-		move.w	#make_art_tile(ArtTile_Sonic,0,0),obGfx(a0) ; set VRAM location
+		move.w	#ArtTile_Sonic,obGfx(a0)		; set VRAM location
 		move.b	#2,obPriority(a0)			; set sprite priority
 		move.b	#$18,obActWid(a0)			; set render width
 		move.b	#4,obRender(a0)				; set to playfield-positioned mode
@@ -1438,8 +1438,22 @@ Sonic_FloorDown:
 		bsr.w	Sonic_FindFloor				; find distance between Sonic and floor
 		move.b	d1,(v_unused6).w			; (unused) store distance to floor
 		tst.w	d1					; has Sonic touched the floor again?
+	if FixBugs=0
 		bpl.s	.return					; if not, branch
+	else
+		bpl.w	.return					; if not, branch
 
+		; The floor depth check should only be done if the floor is top solid,
+		; not fully solid. Otherwise, if Sonic manages to clip into a fully
+		; solid floor (i.e. the Lava Reef Zone stairs clip in Sonic & Knuckles),
+		; Sonic could potentially fall right through.
+
+		; Note that modifications to FindWall, FindFloor, Sonic_FindFloor,
+		; Sonic_FindWallRight, Sonic_FindCeiling, Sonic_FindWallLeft, and
+		; Sonic_FindSmaller are needed for this fix to work.
+		btst	#$E,d4					; is the floor fully solid?
+		bne.s	.landed					; if so, branch
+	endif
 		move.b	obVelY(a0),d2				; get Sonic's fall speed at the time of impact (upper byte only, pixel delta)
 		addq.b	#8,d2					; increase it by one tile
 		neg.b	d2					; mirror it
@@ -1556,6 +1570,28 @@ Sonic_FloorLeft:
 		bsr.w	Sonic_FindFloor				; find Sonic's distance to floor
 		tst.w	d1					; has Sonic touched the floor?
 		bpl.s	.return					; if not, branch
+	if FixBugs
+		; See explanation in .norightgraze under Sonic_FloorDown
+		btst	#$E,d4					; is the floor fully solid?
+		bne.s	.landed					; if so, branch
+
+		; When Sonic is moving down and a floor collision is detected, there exists
+		; a check that makes it so that he doesn't clip on top of a surface that
+		; he's too far below from. However, said check doesn't exist for when Sonic
+		; is moving left or right. The effects of this can easily be seen if you
+		; place a solid object on a top solid surface and hit the object from the bottom,
+		; where Sonic's Y movement will be cancelled out, causing him to start checking
+		; for floor collision, which makes him clip onto the surface.
+		move.b	obVelY(a0),d2				; get Sonic's fall speed at the time of impact (upper byte only, pixel delta)
+		addq.b	#8,d2					; increase it by one tile
+		neg.b	d2					; mirror it
+		cmp.b	d2,d1					; is result bigger than distance to floor?
+		bge.s	.landed					; if yes, branch
+		cmp.b	d2,d0					; is result bigger than distance to floor? (sloped variant)
+		blt.s	.return					; if not, branch
+
+.landed:
+	endif
 		add.w	d1,obY(a0)				; align Sonic with floor
 	if FixBugs
 		clr.w	obSubpixelY(a0)				; reset subpixel portion
@@ -1673,6 +1709,22 @@ Sonic_FloorRight:
 		bsr.w	Sonic_FindFloor				; find Sonic's distance to floor
 		tst.w	d1					; has Sonic touched the floor?
 		bpl.s	.return					; if not, branch
+	if FixBugs
+		; See explanation in .norightgraze under Sonic_FloorDown
+		btst	#$E,d4					; is the floor fully solid?
+		bne.s	.landed					; if so, branch
+
+		; See explanation in .noceiling under Sonic_FloorLeft
+		move.b	obVelY(a0),d2				; get Sonic's fall speed at the time of impact (upper byte only, pixel delta)
+		addq.b	#8,d2					; increase it by one tile
+		neg.b	d2					; mirror it
+		cmp.b	d2,d1					; is result bigger than distance to floor?
+		bge.s	.landed					; if yes, branch
+		cmp.b	d2,d0					; is result bigger than distance to floor? (sloped variant)
+		blt.s	.return					; if not, branch
+
+.landed:
+	endif
 		add.w	d1,obY(a0)				; align Sonic with floor
 	if FixBugs
 		clr.w	obSubpixelY(a0)				; reset subpixel portion
@@ -1922,7 +1974,7 @@ Sonic_Loops:
 		move.b	obX(a0),d1				; get Sonic's current X-position
 		andi.w	#$7F,d1					; mask out irrelevant bits for X-position
 		add.w	d1,d0					; combine the two (this is now the index to get the current 256x256 chunk in the level)
-		lea	(v_lvllayout).w,a1			; load level layout
+		lea	(v_lvllayout_fg).w,a1			; load foreground level layout
 		move.b	(a1,d0.w),d1				; load ID of 256x256 chunk Sonic is currently standing on
 
 		cmp.b	(v_256roll1).w,d1			; is Sonic on a "roll tunnel" tile? (type A, entrance from the left)
@@ -2232,7 +2284,7 @@ Sonic_LoadGfx:
 		bmi.s	.nochange				; if this was an empty entry, nothing to do, branch
 
 		lea	(v_sgfx_buffer).w,a3			; load Sonic's graphics transfer buffer
-		move.b	#1,(f_sonframechg).w			; set flag for V-Blank to update Sonic graphics via DMA
+		move.b	#1,(f_sonframechg).w			; set flag for VBlank to update Sonic graphics via DMA
 
 ; SPLC_ReadEntry:
 .readentry:

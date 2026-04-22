@@ -18,7 +18,7 @@ Cbal_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.b	#7,obHeight(a0)
 		move.l	#Map_Hog,obMap(a0)
-		move.w	#make_art_tile(ArtTile_Ball_Hog,1,0),obGfx(a0)
+		move.w	#ArtTile_Ball_Hog|Tile_Pal2,obGfx(a0)
 		move.b	#4,obRender(a0)
 		move.b	#3,obPriority(a0)
 		move.b	#$87,obColType(a0)
@@ -58,10 +58,17 @@ Cbal_ChkExplode:
 		bpl.s	Cbal_Animate	; if time is > 0, branch
 
 Cbal_Explode:
-		_move.b	#id_MissileDissolve,obID(a0)
-		_move.b	#id_ExplosionBomb,obID(a0)	; change object to an explosion ($3F)
-		move.b	#0,obRoutine(a0) ; reset routine counter
-		bra.w	ExplosionBomb	; jump to explosion code
+		; This is a leftover from the front-facing prototype Ball Hogs, where the
+		; dropped cannonballs would spawn a small explosion instead of the regular one.
+		; However, after setting the ID, it immediately gets replaced again with the
+		; normal explosions, making this object (and its associated graphics) unused.
+		; The small explosion is technically also used by the Buzz Bomber's missiles,
+		; but also goes completely unused because the relevant flag is never set
+		; and no graphics are ever loaded into VRAM (would be "Nem_UnkExplode").
+		_move.b	#id_UnusedExplosion,obID(a0)	; change object to small explosion ($24), and...
+		_move.b	#id_Explosion,obID(a0)		; ...immediately change it again to a normal explosion ($3F)
+		move.b	#0,obRoutine(a0)		; reset routine counter
+		bra.w	Explosion			; jump to explosion code
 ; ===========================================================================
 
 Cbal_Animate:

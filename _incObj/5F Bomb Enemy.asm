@@ -21,7 +21,7 @@ bom_parent = objoff_3C		; address of parent object
 Bom_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Bomb,obMap(a0)
-		move.w	#make_art_tile(ArtTile_Bomb,0,0),obGfx(a0)
+		move.w	#ArtTile_Bomb,obGfx(a0)
 		ori.b	#4,obRender(a0)
 		move.b	#3,obPriority(a0)
 		move.b	#$C,obActWid(a0)
@@ -84,7 +84,7 @@ Bom_Action:	; Routine 2
 .explode:
 		subq.w	#1,bom_time(a0)	; subtract 1 from time delay
 		bpl.s	.noexplode	; if time remains, branch
-		_move.b	#id_ExplosionBomb,obID(a0) ; change bomb into an explosion
+		_move.b	#id_Explosion,obID(a0) ; change bomb into an explosion
 		move.b	#0,obRoutine(a0)
 
 .noexplode:
@@ -195,4 +195,10 @@ Bom_End:	; Routine 6
 		bpl.w	DeleteObject
 		bra.w	DisplaySprite
 ; ===========================================================================
-Bom_ShrSpeed:	dc.w -$200, -$300, -$100, -$200, $200, -$300, $100, -$200
+
+Bom_ShrSpeed:	;    X-vel  Y-vel
+		dc.w -$200, -$300
+		dc.w -$100, -$200
+		dc.w  $200, -$300
+		dc.w  $100, -$200
+; ===========================================================================

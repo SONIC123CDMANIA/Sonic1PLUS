@@ -21,6 +21,9 @@ debug_reg:		equ $C0001C
 
 ; Z80 addresses
 z80_ram:		equ $A00000	; start of Z80 RAM
+z80_dac3_pitch:		equ $A000EA
+z80_dac_status:		equ $A01FFD
+z80_dac_sample:		equ $A01FFF
 z80_ram_end:		equ $A02000	; end of non-reserved Z80 RAM
 ym2612_a0:		equ $A04000
 ym2612_d0:		equ $A04001
@@ -52,9 +55,13 @@ vram_bg:	equ $E000	; background namespace
 vram_sprites:	equ $F800	; sprite table
 vram_hscroll:	equ $FC00	; horizontal scroll table
 
+; Various sizes
 tile_size:	equ 8*8/2	; size of a single 8x8 tile
 chunk_size:	equ $200	; size of a single 256x256 chunk
 plane_size_64x32: equ 64*32*2	; size of plane in 512x256 mode
+
+layout_row_interlaced:	equ $40			; size of a single level layout row (FG/BG alternating)
+layout_row:	equ layout_row_interlaced*2	; size of a single level layout row (skipping over other plane)
 
 ; Levels (zones)
 id_GHZ:		equ 0
@@ -219,6 +226,9 @@ afRoutine:	equ $FC	; increment routine counter
 afReset:	equ $FB	; reset animation and 2nd object routine counter
 af2ndRoutine:	equ $FA	; increment 2nd routine counter
 
+aniXFlip:	equ $20 ; horizontally mirrors the current frame
+aniYFlip:	equ $40 ; vertically mirrors the current frame
+
 ; Background music
 bgm__First:	equ $81
 bgm_GHZ:	equ ((ptr_mus81-MusicIndex)/4)+bgm__First
@@ -337,7 +347,7 @@ boss_fz_x:	equ $2450		; Final Zone
 boss_fz_y:	equ $510
 boss_fz_end:	equ boss_fz_x+$2B0
 
-; Tile flags (ASM68K-specific, replaces "make_art_tile" function from AS, added here for cross-compatibility)
+; Tile flags (replaces the old "make_art_tile" function)
 Tile_Prio:	equ	1<<15
 Tile_Pal1:	equ	0<<13
 Tile_Pal2:	equ	1<<13
@@ -444,7 +454,7 @@ ArtTile_Level:			equ $000
 ArtTile_Ball_Hog:		equ $302
 ArtTile_Bomb:			equ $400
 ArtTile_Crabmeat:		equ $400
-ArtTile_Missile_Disolve:	equ $41C ; Unused
+ArtTile_UnusedExplosion:	equ $41C ; Unused
 ArtTile_Buzz_Bomber:		equ $444
 ArtTile_Chopper:		equ $47B
 ArtTile_Yadrin:			equ $47B

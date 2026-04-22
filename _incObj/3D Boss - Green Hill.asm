@@ -35,7 +35,7 @@ BGHZ_LoadBoss:
 		move.w	obX(a0),obX(a1)
 		move.w	obY(a0),obY(a1)
 		move.l	#Map_Eggman,obMap(a1)
-		move.w	#make_art_tile(ArtTile_Eggman,0,0),obGfx(a1)
+		move.w	#ArtTile_Eggman,obGfx(a1)
 		move.b	#4,obRender(a1)
 		move.b	#$20,obActWid(a1)
 		move.b	#3,obPriority(a1)
@@ -129,12 +129,12 @@ loc_1784C:
 ; ---------------------------------------------------------------------------
 
 BossDefeated:
-		move.b	(v_vbla_byte).w,d0
+		move.b	(v_vblank_byte).w,d0
 		andi.b	#7,d0
 		bne.s	locret_178A2
 		jsr	(FindFreeObj).l
 		bne.s	locret_178A2
-		_move.b	#id_ExplosionBomb,obID(a1)	; load explosion object
+		_move.b	#id_Explosion,obID(a1)	; load explosion object
 		move.w	obX(a0),obX(a1)
 		move.w	obY(a0),obY(a1)
 		jsr	(RandomNumber).l

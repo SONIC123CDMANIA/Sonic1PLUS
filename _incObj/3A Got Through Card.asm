@@ -48,7 +48,7 @@ Got_Loop:
 loc_C5CA:
 		move.b	d0,obFrame(a1)
 		move.l	#Map_Got,obMap(a1)
-		move.w	#make_art_tile(ArtTile_Title_Card,0,1),obGfx(a1)
+		move.w	#ArtTile_Title_Card|Tile_Prio,obGfx(a1)
 		move.b	#0,obRender(a1)
 		lea	object_size(a1),a1
 		dbf	d1,Got_Loop	; repeat 6 times
@@ -133,7 +133,7 @@ locret_C692:
 
 Got_AddBonus:
 		jsr	(AddPoints).l
-		move.b	(v_vbla_byte).w,d0
+		move.b	(v_vblank_byte).w,d0
 		andi.b	#3,d0
 		bne.s	locret_C692
 		move.w	#sfx_Switch,d0
