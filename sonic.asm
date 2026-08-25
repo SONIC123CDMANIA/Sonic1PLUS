@@ -21,17 +21,17 @@ FixBugs = 1
 ;	| If 1, enables various bugfixes across the game and sound driver
 ;	|       (see also the "_Fixed Binary Files" folder, and FixMusicAndSFXDataBugs)
 
-CheatsEnabled = 0
+CheatsEnabled = 1
 ;	| If 1, all in-game cheats (Level Select, Debug Mode, Slow-Motion, Japanese Credits)
 ;	|       will be enabled by default, without requiring any title screen button inputs
 
 AllOptimizations = 1
 ;	| If 1, enables all optimizations
-SkipChecksumCheck = 0|AllOptimizations
+SkipChecksumCheck = 1|AllOptimizations
 ;	| If 1, disables the slow bootup checksum calculation
-ZeroOffsetOptimization = 0|AllOptimizations
+ZeroOffsetOptimization = 1|AllOptimizations
 ;	| If 1, makes a handful of zero-offset instructions smaller
-PaddingOptimization = 0|AllOptimizations
+PaddingOptimization = 1|AllOptimizations
 ;	| If 1, removes about 3 KB of various superfluous padding
 
 EnableSRAM = 1
@@ -42,7 +42,7 @@ AddressSRAM = 0
 ;	| 0 = odd+even; 2 = even only; 3 = odd only
 ;	| (odd only is the most common setting)
 
-NewStuff = 0
+NewStuff = 2
 ;	| 0 = Normal Game; 1 = Has spindash, peel-out, and homing attack; 2 = More zones, unrestricted moves, and (potentially) more characters.
 ZoneCount = 6
 ;	| Used for the "zonewarning" macro. Do not change, unless more zones get added.
