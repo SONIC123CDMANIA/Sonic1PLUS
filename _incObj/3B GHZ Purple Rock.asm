@@ -33,6 +33,21 @@ Rock_Solid:	; Routine 2
 		move.w	#32/2,d3				; SolidObject input: height (stood-on)
 		move.w	obX(a0),d4				; SolidObject input: object X-position (stood-on)
 		bsr.w	SolidObject				; make rock solid for Sonic
+		btst	#3,obStatus(a0)		; is Sonic standing on the object now?
+		beq.s	.display		; if not, keep solid
+		cmpi.b	#id_Roll,obPrevAni(a1)	; was Sonic rolling while landing?
+		bne.s	.display		; if not, keep solid
+		lea	(Rock_Speeds).l,a4 	; load fragments speed data
+		moveq	#1,d1			; load number of fragments (minus one)
+		move.w	#$38,d2			; load value of falling speed mod
+		bsr.w	SmashObject		; break the object
+		.fragment:	; Routine 4
+		bsr.w	ObjectFall		; update object's position and speed-up falling
+		tst.b	obRender(a0)		; is the fragment off-screen?
+		bpl.w	DeleteObject		; if yes, delete the object
+		bra.w	DisplaySprite		; if not, display
+		
+	.display:
 
 	if FixBugs
 		; Objects shouldn't call DisplaySprite and DeleteObject in
@@ -46,3 +61,8 @@ Rock_Solid:	; Routine 2
 		out_of_range.w	DeleteObject			; has object gone out of range? if yes, delete it
 		rts						; return
 	endif
+; ===========================================================================
+; defining initial speeds of each fragment
+Rock_Speeds:	; x-speed, y-speed
+		dc.w -$200, -$200	; fragment 1
+		dc.w  $200, -$200	; fragment 2
