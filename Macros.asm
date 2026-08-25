@@ -1,3 +1,8 @@
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Macros (game-specific)
+; ---------------------------------------------------------------------------
+
 ; ---------------------------------------------------------------------------
 ; Set a VRAM address via the VDP control port.
 ; input: 16-bit VRAM address, control port (default is (vdp_control_port).l)
@@ -14,9 +19,9 @@ locVRAM:	macro loc,controlport=(vdp_control_port).l
 
 writeVRAM:	macro source,destination
 		lea	(vdp_control_port).l,a5
-		move.l	#$94000000+((((source_end-source)>>1)&$FF00)<<8)+$9300+(((source_end-source)>>1)&$FF),(a5)
-		move.l	#$96000000+(((source>>1)&$FF00)<<8)+$9500+((source>>1)&$FF),(a5)
-		move.w	#$9700+((((source>>1)&$FF0000)>>16)&$7F),(a5)
+		move.l	#vreg_dmalen|((((source_end-source)>>1)&$FF00)<<8)|(((source_end-source)>>1)&$FF),(a5)
+		move.l	#vreg_dmasrc|(((source>>1)&$FF00)<<8)|((source>>1)&$FF),(a5)
+		move.w	#vreg_dmamode|((((source>>1)&$FF0000)>>16)&$7F),(a5)
 		move.w	#$4000+((destination)&$3FFF),(a5)
 		move.w	#$80+(((destination)&$C000)>>14),(v_vdp_buffer2).w
 		move.w	(v_vdp_buffer2).w,(a5)
@@ -29,9 +34,9 @@ writeVRAM:	macro source,destination
 
 writeCRAM:	macro source,destination
 		lea	(vdp_control_port).l,a5
-		move.l	#$94000000+((((source_end-source)>>1)&$FF00)<<8)+$9300+(((source_end-source)>>1)&$FF),(a5)
-		move.l	#$96000000+(((source>>1)&$FF00)<<8)+$9500+((source>>1)&$FF),(a5)
-		move.w	#$9700+((((source>>1)&$FF0000)>>16)&$7F),(a5)
+		move.l	#vreg_dmalen|((((source_end-source)>>1)&$FF00)<<8)|(((source_end-source)>>1)&$FF),(a5)
+		move.l	#vreg_dmasrc|(((source>>1)&$FF00)<<8)|((source>>1)&$FF),(a5)
+		move.w	#vreg_dmamode|((((source>>1)&$FF0000)>>16)&$7F),(a5)
 		move.w	#$C000+(destination&$3FFF),(a5)
 		move.w	#$80+((destination&$C000)>>14),(v_vdp_buffer2).w
 		move.w	(v_vdp_buffer2).w,(a5)
@@ -44,15 +49,15 @@ writeCRAM:	macro source,destination
 
 fillVRAM:	macro byte,start,end
 		lea	(vdp_control_port).l,a5
-		move.w	#$8F01,(a5) ; Set increment to 1, since DMA fill writes bytes
-		move.l	#$94000000+((((end)-(start)-1)&$FF00)<<8)+$9300+(((end)-(start)-1)&$FF),(a5)
-		move.w	#$9780,(a5)
+		move.w	#vreg_autoinc|1,(a5) ; Set increment to 1, since DMA fill writes bytes
+		move.l	#vreg_dmalen|((((end)-(start)-1)&$FF00)<<8)|(((end)-(start)-1)&$FF),(a5)
+		move.w	#vreg_dmamode|%10<<6,(a5)
 		move.l	#$40000080+(((start)&$3FFF)<<16)+(((start)&$C000)>>14),(a5)
 		move.w	#(byte)|(byte)<<8,(vdp_data_port).l
 .wait:		move.w	(a5),d1
 		btst	#1,d1
 		bne.s	.wait
-		move.w	#$8F02,(a5) ; Set increment back to 2, since the VDP usually operates on words
+		move.w	#vreg_autoinc|2,(a5) ; Set increment back to 2, since the VDP usually operates on words
 		endm
 
 ; ---------------------------------------------------------------------------
@@ -138,7 +143,7 @@ startZ80:	macro
 ; ---------------------------------------------------------------------------
 
 disable_ints:	macro
-		move.w	#$2700,sr
+		move.w	#$2700,sr				; disable interrupts
 		endm
 
 ; ---------------------------------------------------------------------------
@@ -146,7 +151,7 @@ disable_ints:	macro
 ; ---------------------------------------------------------------------------
 
 enable_ints:	macro
-		move.w	#$2300,sr
+		move.w	#$2300,sr				; enable interrupts
 		endm
 
 ; ---------------------------------------------------------------------------
@@ -154,9 +159,9 @@ enable_ints:	macro
 ; ---------------------------------------------------------------------------
 
 disable_display:	macro
-		move.w	(v_vdp_buffer1).w,d0		; get buffered copy of VDP register $81
-		andi.b	#%10111111,d0			; clear bit 6 (disable display; fill with background color)
-		move.w	d0,(vdp_control_port).l		; write to VDP
+		move.w	(v_vdp_buffer1).w,d0			; get buffered copy of vreg_mode2
+		andi.b	#%10111111,d0				; clear bit 6 (disable display; fill with background color)
+		move.w	d0,(vdp_control_port).l			; write to VDP
 		endm
 
 ; ---------------------------------------------------------------------------
@@ -164,9 +169,9 @@ disable_display:	macro
 ; ---------------------------------------------------------------------------
 
 enable_display:	macro
-		move.w	(v_vdp_buffer1).w,d0		; get buffered copy of VDP register $81
-		ori.b	#%01000000,d0			; set bit 6 (enable display)
-		move.w	d0,(vdp_control_port).l		; write to VDP
+		move.w	(v_vdp_buffer1).w,d0			; get buffered copy of vreg_mode2
+		ori.b	#%01000000,d0				; set bit 6 (enable display)
+		move.w	d0,(vdp_control_port).l			; write to VDP
 		endm
 
 ; ---------------------------------------------------------------------------
@@ -175,6 +180,12 @@ enable_display:	macro
 
 jhi:		macro loc
 		bls.s	.nojump
+		jmp	loc
+.nojump:
+		endm
+
+jls:		macro loc
+		bhi.s	.nojump
 		jmp	loc
 .nojump:
 		endm
@@ -189,12 +200,6 @@ jhs:		macro loc
 		jcc	loc
 		endm
 
-jls:		macro loc
-		bhi.s	.nojump
-		jmp	loc
-.nojump:
-		endm
-
 jcs:		macro loc
 		bcc.s	.nojump
 		jmp	loc
@@ -205,38 +210,26 @@ jlo:		macro loc
 		jcs	loc
 		endm
 
-jeq:		macro loc
-		bne.s	.nojump
-		jmp	loc
-.nojump:
-		endm
-
 jne:		macro loc
 		beq.s	.nojump
 		jmp	loc
 .nojump:
 		endm
 
-jgt:		macro loc
-		ble.s	.nojump
+jeq:		macro loc
+		bne.s	.nojump
 		jmp	loc
 .nojump:
 		endm
 
-jge:		macro loc
-		blt.s	.nojump
+jvc:		macro loc
+		bvs.s	.nojump
 		jmp	loc
 .nojump:
 		endm
 
-jle:		macro loc
-		bgt.s	.nojump
-		jmp	loc
-.nojump:
-		endm
-
-jlt:		macro loc
-		bge.s	.nojump
+jvs:		macro loc
+		bvc.s	.nojump
 		jmp	loc
 .nojump:
 		endm
@@ -253,22 +246,50 @@ jmi:		macro loc
 .nojump:
 		endm
 
+jge:		macro loc
+		blt.s	.nojump
+		jmp	loc
+.nojump:
+		endm
+
+jlt:		macro loc
+		bge.s	.nojump
+		jmp	loc
+.nojump:
+		endm
+
+jgt:		macro loc
+		ble.s	.nojump
+		jmp	loc
+.nojump:
+		endm
+
+jle:		macro loc
+		bgt.s	.nojump
+		jmp	loc
+.nojump:
+		endm
+
 ; ---------------------------------------------------------------------------
 ; check if object moves out of range
-; input: location to jump to if out of range, x-axis pos (obX(a0) by default)
+; input: location to jump to if out of range, x-axis pos (obX(a0) by default), optional bmi exit
 ; ---------------------------------------------------------------------------
 
-out_of_range:	macro exit,pos
+out_of_range:	macro exit,pos,bmicheck
 	if ("pos"<>"")
-		move.w	pos,d0		; get object position (if specified as not obX)
+		move.w	pos,d0					; get object position (if specified as not obX)
 	else
-		move.w	obX(a0),d0	; get object position
+		move.w	obX(a0),d0				; get object position
 	endif
-		andi.w	#$FF80,d0	; round down to nearest $80
-		move.w	(v_screenposx).w,d1 ; get screen position
+		andi.w	#$FF80,d0				; round down to nearest $80
+		move.w	(v_screenposx).w,d1			; get screen position
 		subi.w	#128,d1
 		andi.w	#$FF80,d1
-		sub.w	d1,d0		; approx distance between object and screen
+		sub.w	d1,d0					; approx distance between object and screen
+	if ("bmicheck"<>"")
+		; This bmi is in a few out_of_range calls (albeit redundant)
+		bmi.w	exit
+	endif
 		cmpi.w	#128+320+192,d0
 		bhi.ATTRIBUTE	exit
 		endm
@@ -318,6 +339,26 @@ btns_mask := btns_mask|btnStart
  endm
 
 ; ---------------------------------------------------------------------------
+; macro to emit a linear range of bytes [first..last] inclusive
+; input: start, end, increment, (optional) repeat each single step
+; ---------------------------------------------------------------------------
+
+range: macro first,last,step,repeat
+	set .rep, 1
+	if "repeat"<>""
+		set .rep, repeat
+	endif
+
+	set .val, first
+	rept 1+(abs(first-last)/abs(step))
+		rept .rep
+			dc.b .val
+		endr
+		set .val, .val+(step)
+	endr
+	endm
+
+; ---------------------------------------------------------------------------
 ; compare the size of an index with ZoneCount constant
 ; (should be used immediately after the index)
 ; input: index address, element size
@@ -350,7 +391,8 @@ incbin:		macro path
 ; Macro to binclude something with an end marker
 ; ---------------------------------------------------------------------------
 
-bincludeEndMarker macro path,{INTLABEL},{GLOBALSYMBOLS}
-__LABEL__:	binclude	path
-__LABEL___end:
-	endm
+bincludeEndMarker macro path,{INTLABEL}
+__LABEL__:	label	 *
+		binclude path
+__LABEL___end:	label	 *
+		endm

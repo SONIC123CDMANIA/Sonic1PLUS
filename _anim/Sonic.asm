@@ -89,7 +89,7 @@ fr_Float5:	equ $53
 fr_Float6:	equ $54
 fr_Injury:	equ $55
 fr_GetAir:	equ $56
-fr_Slide:	equ $57 ; formerly mamed fr_WaterSlide (was too long...)
+fr_Slide:	equ $57 ; formerly named fr_WaterSlide (was too long...)
 
 
 ; ---------------------------------------------------------------------------
@@ -97,8 +97,8 @@ fr_Slide:	equ $57 ; formerly mamed fr_WaterSlide (was too long...)
 ; ---------------------------------------------------------------------------
 
 ; Macro to map an ID to a label while defining the offset table entries
-sonani:		macro anim,{INTLABEL},{GLOBALSYMBOLS}
-__LABEL__: =	(*-Ani_Sonic)/2
+sonani:		macro anim,{INTLABEL}
+__LABEL__:	label	(*-Ani_Sonic)/2
 		dc.w	anim-Ani_Sonic
 		endm
 ; ---------------------------------------------------------------------------
@@ -152,7 +152,7 @@ SonAni_Walk:	dc.b $FF
 
 SonAni_Run:	dc.b $FF
 		dc.b fr_Run11,  fr_Run12,  fr_Run13,  fr_Run14,  afEnd,     afEnd
-		dc.b afEnd 
+		dc.b afEnd
 		even
 
 SonAni_Roll:	dc.b $FE

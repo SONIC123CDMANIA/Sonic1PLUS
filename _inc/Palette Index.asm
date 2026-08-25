@@ -2,11 +2,11 @@
 ; Palette index
 ; ---------------------------------------------------------------------------
 
-makePalEntry:	macro paletteLabel,paletteRAMaddress,{INTLABEL},{GLOBALSYMBOLS}
-__LABEL__: = (*-Pal_Index)/8
-	dc.l paletteLabel
-	dc.w paletteRAMaddress,(paletteLabel_end-paletteLabel)/4-1
-	endm
+makePalEntry:	macro paletteLabel,paletteRAMaddress,{INTLABEL}
+__LABEL__:	label	(*-Pal_Index)/8
+		dc.l paletteLabel
+		dc.w paletteRAMaddress,(paletteLabel_end-paletteLabel)/4-1
+		endm
 ; ---------------------------------------------------------------------------
 
 Pal_Index:
@@ -18,8 +18,7 @@ palid_Title:		makePalEntry	Pal_Title,		v_palette_line_1
 palid_LevelSel:		makePalEntry	Pal_LevelSel,		v_palette_line_1
 palid_Sonic:		makePalEntry	Pal_Sonic,		v_palette_line_1
 
-Pal_Levels:
-
+	Pal_Levels:
 palid_GHZ:		makePalEntry	Pal_GHZ, 		v_palette_line_2
 palid_LZ:		makePalEntry	Pal_LZ, 		v_palette_line_2
 palid_MZ:		makePalEntry	Pal_MZ, 		v_palette_line_2

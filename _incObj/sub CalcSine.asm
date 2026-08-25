@@ -1,22 +1,23 @@
+; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Subroutine calculate a sine and cosine
-
+; 
 ; input:
 ;	d0 = angle
-
+; 
 ; output:
 ;	d0 = sine
 ;	d1 = cosine
 ; ---------------------------------------------------------------------------
 
 CalcSine:
-		andi.w	#$FF,d0			; clear upper input byte
-		add.w	d0,d0			; multiply input for word-sized addressing
-		addi.w	#$80,d0			; advance to sine value index
-		move.w	Sine_Data(pc,d0.w),d1	; retrieve sine value
-		subi.w	#$80,d0			; go back cosine value index
-		move.w	Sine_Data(pc,d0.w),d0	; retrieve cosine value
-		rts				; return
+		andi.w	#$FF,d0					; clear upper input byte
+		add.w	d0,d0					; multiply input for word-sized addressing
+		addi.w	#$80,d0					; advance to cosine value index
+		move.w	Sine_Data(pc,d0.w),d1			; get cosine value
+		subi.w	#$80,d0					; go back sine value index
+		move.w	Sine_Data(pc,d0.w),d0			; get sine value
+		rts						; return
 ; End of function CalcSine
 
 ; ===========================================================================

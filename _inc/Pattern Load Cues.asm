@@ -1,16 +1,18 @@
+; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Pattern load cues
 ; ---------------------------------------------------------------------------
 
 ; Macro to define PLC pointer entry
-plcptr:		macro plc,{INTLABEL},{GLOBALSYMBOLS}
-__LABEL__: =	(*-ArtLoadCues)/2
+plcptr:		macro plc,{INTLABEL}
+__LABEL__:	label	(*-ArtLoadCues)/2
 		dc.w	plc-ArtLoadCues
 		endm
 
 ; Macro for the header of a PLC list
-plcheader:	macro {INTLABEL},{GLOBALSYMBOLS}
-__LABEL__:	dc.w ((__LABEL___end-__LABEL__-2)/6)-1
+plcheader:	macro {INTLABEL}
+__LABEL__:	label	*
+		dc.w ((__LABEL___end-__LABEL__-2)/6)-1
 		endm
 
 ; Macro for single pattern load cue entry
@@ -130,7 +132,7 @@ PLC_GHZ2_end:
 ; Pattern load cues - Labyrinth
 ; ---------------------------------------------------------------------------
 PLC_LZ:		plcheader
-		plcm	Nem_LZ,	ArtTile_Level			; LZ main patterns
+		plcm	Nem_LZ,		ArtTile_Level			; LZ main patterns
 		plcm	Nem_LzBlock1,	ArtTile_LZ_Block_1		; block
 		plcm	Nem_LzBlock2,	ArtTile_LZ_Block_2		; blocks
 		plcm	Nem_Splash,	ArtTile_LZ_Splash		; waterfalls and splash
@@ -150,7 +152,7 @@ PLC_LZ2:	plcheader
 		plcm	Nem_LzWheel,	ArtTile_LZ_Conveyor_Belt	; wheel
 		plcm	Nem_Gargoyle,	ArtTile_LZ_Gargoyle		; gargoyle head
 	if Revision=0
-		plcm	Nem_LzSonic,	ArtTile_LZ_Sonic_Drowning	; Sonic holding his breath
+		plcm	Nem_LzSonic,	ArtTile_LZ_UnusedFace		; unused face of Sonic holding his breath
 	endif
 		plcm	Nem_LzPlatfm,	ArtTile_LZ_Rising_Platform	; rising platform
 		plcm	Nem_Orbinaut,	ArtTile_LZ_Orbinaut		; orbinaut enemy
@@ -179,7 +181,7 @@ PLC_MZ:		plcheader
 PLC_MZ_end:
 
 PLC_MZ2:	plcheader
-		plcm	Nem_MzSwitch,	ArtTile_Button+4		; switch
+		plcm	Nem_MzSwitch,	ArtTile_Button_Main		; switch
 		plcm	Nem_Spikes,	ArtTile_Spikes			; spikes
 		plcm	Nem_HSpring,	ArtTile_Spring_Horizontal	; horizontal spring
 		plcm	Nem_VSpring,	ArtTile_Spring_Vertical		; vertical spring
@@ -395,7 +397,7 @@ PLC_SSResult_end:
 ; Pattern load cues - ending sequence
 ; ---------------------------------------------------------------------------
 PLC_Ending:	plcheader
-		plcm	Nem_GHZ_1st,	ArtTile_Level		; GHZ main patterns
+		plcm	Nem_GHZ_1st,	ArtTile_Level			; GHZ main patterns
 		plcm	Nem_GHZ_2nd,	ArtTile_Level+$1CD		; GHZ secondary patterns
 		plcm	Nem_Stalk,	ArtTile_GHZ_Flower_Stalk	; flower stalk
 		plcm	Nem_EndFlower,	ArtTile_Ending_Flowers		; flowers

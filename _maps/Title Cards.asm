@@ -181,7 +181,7 @@ Map_Got:	mappingsTable
 	mappingsTableEntry.w	M_Card_Act1	; Act number 1
 	mappingsTableEntry.w	M_Card_Act2	; Act number 2
 	mappingsTableEntry.w	M_Card_Act3	; Act number 3
-	
+
 M_Got_SonicHas:	spriteHeader	; SONIC HAS
 	spritePiece	-$48, -8, 2, 2, $3E, 0, 0, 0, 0	; S
 	spritePiece	-$38, -8, 2, 2, $32, 0, 0, 0, 0	; O
@@ -237,10 +237,10 @@ M_Got_RBonus_End
 ; Sprite mappings - special stage results screen
 ; ---------------------------------------------------------------------------
 Map_SSR:	mappingsTable
-	mappingsTableEntry.w	M_SSR_Chaos	; "CHAOS EMERLADS" text
+	mappingsTableEntry.w	M_SSR_Chaos	; "CHAOS EMERALDS" text
 	mappingsTableEntry.w	M_SSR_Score	; Score tally
 	mappingsTableEntry.w	M_SSR_Ring	; Ring Bonus tally
-	mappingsTableEntry.w	M_Card_Oval	; Blue oval (cross-referended from the regular title card mappings)
+	mappingsTableEntry.w	M_Card_Oval	; Blue oval (cross-referenced from the regular title card mappings)
 	mappingsTableEntry.w	M_SSR_ContSon1	; Continue tally with mini Sonic (foot down)
 	mappingsTableEntry.w	M_SSR_ContSon2	; Continue tally with mini Sonic (foot up)
 	mappingsTableEntry.w	M_SSR_Continue	; Continue tally without mini Sonic
