@@ -357,9 +357,18 @@ BMZ_Recover:
 ; ===========================================================================
 
 .playMusic:
-		clr.w	obVelY(a0)				; stop rising
-		move.w	#bgm_MZ,d0
-		jsr	(QueueSound1).l				; play MZ music
+		clr.w    obVelY(a0)
+		tst.b     (v_invinc).w
+		bne.s   .boss_invinc
+
+		move.b   Saved_music,d0
+		bra.w      .boss_play
+
+.boss_invinc:
+		move.b #bgm_Invincible,d0
+
+.boss_play:
+		jsr PlaySound
 
 ; loc_1857A
 .exit:
