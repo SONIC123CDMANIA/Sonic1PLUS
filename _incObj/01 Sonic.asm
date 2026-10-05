@@ -163,11 +163,8 @@ Sonic_Display:
 		cmpi.w	#12,(v_air).w				; is drowning countdown active?
 		blo.s	.removeinvincible			; if yes, don't change music
 
-		moveq	#0,d0					; clear d0
-		move.b	(v_zone).w,d0				; get current zone ID
-		cmpi.w	#id_LZ_act4,(v_zone_act).w		; check if level is SBZ3 (LZ4)
-		bne.s	.music					; if not, branch
-		moveq	#5,d0					; play SBZ music instead of LZ
+		move.b    Saved_music,d0    ; loads song number from RAM
+		jsr    (PlaySound).l    ; play normal music
 
 ; Obj01_PlayMusic:
 .music:
