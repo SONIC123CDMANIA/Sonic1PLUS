@@ -209,29 +209,6 @@ React_CollisionDetected:
 ; ---------------------------------------------------------------------------
 
 React_Monitor:
-		tst.w	obVelY(a0)				; is Sonic moving upwards?
-		bpl.s	.chkBreakMonitor			; if not, branch
-	if FixBugs
-		; Fix bumping monitors while Sonic isn't airborne
-		btst	#1,obStatus(a0)				; is Sonic in air?
-		beq.s	.chkBreakMonitor			; if not, don't bump monitor
-	endif
-
-.chkBumpMonitor:
-		move.w	obY(a0),d0				; get Sonic's Y-position
-		subi.w	#16,d0					; check 16px higher
-		cmp.w	obY(a1),d0				; has Sonic touched the monitor from below?
-		blo.s	.return					; if not, branch
-
-		neg.w	obVelY(a0)				; reverse Sonic's vertical speed
-		move.w	#-$180,obVelY(a1)			; bump monitor upwards a little
-		tst.b	ob2ndRout(a1)				; is monitor being stood on or already set to fall?
-		bne.s	.return					; if yes, do nothing
-		addq.b	#4,ob2ndRout(a1)			; advance the monitor's secondary routine counter to ".fall" state
-		rts						; return
-; ---------------------------------------------------------------------------
-
-.chkBreakMonitor:
 		cmpi.b	#id_Roll,obAnim(a0)			; is Sonic rolling/jumping?
 		bne.s	.return					; if not, don't break monitor
 		neg.w	obVelY(a0)				; reverse Sonic's y-motion
