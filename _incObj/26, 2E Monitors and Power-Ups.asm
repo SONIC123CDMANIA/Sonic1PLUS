@@ -64,8 +64,6 @@ Mon_Main:	; Routine 0
 Mon_Solid:	; Routine 2
 		move.b	ob2ndRout(a0),d0			; is monitor set to fall or being stood on?
 		beq.s	.normal					; if not, branch
-		subq.b	#2,d0					; is monitor specifically set to fall?
-		bne.s	.fall					; if yes, branch
 
 		; 2nd Routine 2
 		moveq	#0,d1					; clear d1
@@ -83,21 +81,11 @@ Mon_Solid:	; Routine 2
 		move.w	obX(a0),d2				; get monitor's X position
 		bsr.w	MvSonicOnPtfm				; make Sonic run along the monitor like a platform
 		bra.w	Mon_Animate				; process monitor normally
-; ===========================================================================
 
-.fall:		; 2nd Routine 4
-		bsr.w	ObjectFall				; apply gravity and update monitor position
-		jsr	(ObjFloorDist).l			; get distance from monitor to floor
-		tst.w	d1					; has monitor hit the floor?
-		bpl.w	Mon_Animate				; if not, branch
-		add.w	d1,obY(a0)				; align monitor with surface
-		clr.w	obVelY(a0)				; stop monitor from falling
-		clr.b	ob2ndRout(a0)				; clear special monitor subroutines
-		bra.w	Mon_Animate				; process monitor normally
 ; ===========================================================================
 
 .normal:	; 2nd Routine 0
-		move.w	#30/2+sonic_solid_width,d1		; width/2
+		move.w	#28/2+sonic_solid_width,d1		; width/2
 		move.w	#30/2,d2				; height/2
 		bsr.w	Mon_SolidSides				; check collision (0 = none; 1 = side; -1 = top/bottom)
 		beq.w	.checkpush				; if not, branch
@@ -385,14 +373,58 @@ Pow_RingSound:
 Pow_ChkS:
 		cmpi.b	#7,d0					; does monitor contain 'S'?
 		bne.s	Pow_ChkGoggles				; if not, branch
-		nop						; 'S' does nothing by default
+
+		move.b	#1,(v_invinc).w				; make Sonic invincible
+		move.w	#20*60,(v_player+invtime).w		; set time limit for invincibility to 20 seconds
+
+		move.b	#id_ShieldItem,(v_starsobj1).w		; load 1st stars object
+		move.b	#1,(v_starsobj1+obAnim).w		; set shortest travel delay
+		move.b	#id_ShieldItem,(v_starsobj2).w		; load 2nd stars object
+		move.b	#2,(v_starsobj2+obAnim).w		; set short travel delay
+		move.b	#id_ShieldItem,(v_starsobj3).w		; load 3rd stars object
+		move.b	#3,(v_starsobj3+obAnim).w		; set long travel delay
+		move.b	#id_ShieldItem,(v_starsobj4).w		; load 4th stars object
+		move.b	#4,(v_starsobj4+obAnim).w		; set longest travel delay
+
+		tst.b	(f_lockscreen).w			; is boss mode on?
+		bne.s	Pow_NoMusic				; if yes, don't change music
+	if Revision<>0
+		cmpi.w	#12,(v_air).w				; is Sonic close to drowning? (countdown music playing)
+		bls.s	Pow_NoMusic				; if yes, don't change music
+	endif
+		move.w	#bgm_Invincible,d0			; set invincibility music
+		jmp	(QueueSound1).l				; play it
+		move.b	#1,(v_shoes).w				; set speed shoes flag (used for reverting when time ran out)
+		move.w	#20*60,(v_player+shoetime).w		; set time limit for speed shoes to 20 seconds
+
+		move.w	#son_maxspeed*2,(v_sonspeedmax).w	; double Sonic's top speed
+		move.w	#son_acceleration*2,(v_sonspeedacc).w	; double Sonic's acceleration
+
+		; In the prototype, Sonic's deceleration was $40 for his regular state and
+		; $80 when having speed shoes. While the former was doubled in the final
+		; game, the latter was not. It's hard to tell whether or not this was simply
+		; an oversight, or an intentional design choice.
+		move.w	#son_deceleration,(v_sonspeeddec).w 	; set Sonic's deceleration (same as regular)
+
+	if FixBugs
+		; Fix speed shoes for underwater state.
+		btst	#6,(v_player+obStatus).w		; is Sonic underwater?
+		beq.s	.notunderwater				; if not, branch
+		move.w	#son_maxspeed,(v_sonspeedmax).w		; initial Sonic's top speed
+		move.w	#son_acceleration,(v_sonspeedacc).w	; initial Sonic's acceleration
+		move.w	#son_deceleration,(v_sonspeeddec).w 	; initial Sonic's deceleration
+	.notunderwater:
+	endif
+
+		move.w	#bgm_Speedup,d0				; set music speed-up command
+		jmp	(QueueSound1).l				; play it
 ; ===========================================================================
 
 Pow_ChkGoggles:
 ; Uncomment these lines to set up the goggles monitor to work with it
-	;	cmpi.b	#8,d0					; does monitor contain goggles?
-	;	bne.s	Pow_ChkEnd				; if not, branch
-	;	nop						; goggles do nothing by default
+		cmpi.b	#8,d0					; does monitor contain goggles?
+		bne.s	Pow_ChkEnd				; if not, branch
+		nop						; goggles do nothing by default
 ; ===========================================================================
 
 Pow_ChkEnd:
