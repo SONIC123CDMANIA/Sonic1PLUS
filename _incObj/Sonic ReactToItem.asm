@@ -259,8 +259,6 @@ React_Enemy:
 React_BossHit:
 		neg.w	obVelX(a0)				; repel Sonic horizontally
 		neg.w	obVelY(a0)				; repel Sonic verticallly
-		asr.w	obVelX(a0)				; halve current X-speed
-		asr.w	obVelY(a0)				; halve current Y-speed
 		move.b	#col_none,obColType(a1)			; set boss to no collision while it's damaged
 
 		subq.b	#1,obBossHits(a1)			; decrement 1 boss HP
