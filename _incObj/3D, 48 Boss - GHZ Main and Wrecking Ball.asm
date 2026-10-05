@@ -277,9 +277,18 @@ BGHZ_Recover:
 
 ; loc_179E0:
 .playMusic:
-		clr.w	obVelY(a0) 				; stop moving
-		move.w	#bgm_GHZ,d0
-		jsr	(QueueSound1).l				; play GHZ music
+		clr.w    obVelY(a0)
+		tst.b     (v_invinc).w
+		bne.s   .boss_invinc
+
+		move.b   Saved_music,d0
+		bra.w      .boss_play
+
+.boss_invinc:
+		move.b #bgm_Invincible,d0
+
+.boss_play:
+		jsr PlaySound
 
 ; loc_179EE:
 .exit:
