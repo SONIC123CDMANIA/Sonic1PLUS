@@ -17,15 +17,15 @@ Revision = 1
 ; 	| If 2, build the hacked version from Sonic Mega Collection, dubbed REVXB,
 ;	|       which (sloppily) fixes the infamous "spike bug" -- not recommended
 
-FixBugs = 0
+FixBugs = 1
 ;	| If 1, enables various bugfixes across the game and sound driver
 ;	|       (see also the "_Fixed Binary Files" folder, and FixMusicAndSFXDataBugs)
 
-CheatsEnabled = 0
+CheatsEnabled = 1
 ;	| If 1, all in-game cheats (Level Select, Debug Mode, Slow-Motion, Japanese Credits)
 ;	|       will be enabled by default, without requiring any title screen button inputs
 
-AllOptimizations = 0
+AllOptimizations = 1
 ;	| If 1, enables all optimizations
 SkipChecksumCheck = 0|AllOptimizations
 ;	| If 1, disables the slow bootup checksum calculation
@@ -38,7 +38,7 @@ EnableSRAM = 0
 ;	| If 1, enable SRAM support
 BackupSRAM = 1
 ;	| 0 = no saving (read-only SRAM); 1 = allow saving
-AddressSRAM = 3
+AddressSRAM = 0
 ;	| 0 = odd+even; 2 = even only; 3 = odd only
 ;	| (odd only is the most common setting)
 
@@ -2683,16 +2683,36 @@ LevelMenuText:
 ; ---------------------------------------------------------------------------
 
 MusicList:
-		dc.b bgm_GHZ		; GHZ
-		dc.b bgm_LZ		; LZ
-		dc.b bgm_MZ		; MZ
-		dc.b bgm_SLZ		; SLZ
-		dc.b bgm_SYZ		; SYZ
-		dc.b bgm_SBZ		; SBZ
-		zonewarning MusicList,1
-		dc.b bgm_FZ		; Ending
-		even
 
+        dc.b bgm_GHZ    ; GHZ1
+        dc.b bgm_GHZ    ; GHZ2
+        dc.b bgm_GHZ    ; GHZ3
+        dc.b bgm_GHZ    ; GHZ4
+        dc.b bgm_LZ    ; LZ1
+        dc.b bgm_LZ    ; LZ2
+        dc.b bgm_LZ    ; LZ3
+        dc.b bgm_SBZ    ; LZ4
+        dc.b bgm_MZ    ; MZ1
+        dc.b bgm_MZ    ; MZ2
+        dc.b bgm_MZ    ; MZ3
+        dc.b bgm_MZ    ; MZ4
+        dc.b bgm_SLZ    ; SLZ1
+        dc.b bgm_SLZ    ; SLZ2
+        dc.b bgm_SLZ    ; SLZ3
+        dc.b bgm_SLZ    ; SLZ4
+        dc.b bgm_SYZ    ; SYZ1
+        dc.b bgm_SYZ    ; SYZ2
+        dc.b bgm_SYZ    ; SYZ3
+        dc.b bgm_SYZ    ; SYZ4
+        dc.b bgm_SBZ    ; SBZ1
+        dc.b bgm_SBZ    ; SBZ2
+        dc.b bgm_FZ    ; SBZ3
+        dc.b bgm_SBZ    ; SBZ4
+        dc.b bgm_GHZ    ; GHZ1
+        dc.b bgm_GHZ    ; GHZ1
+        dc.b bgm_GHZ    ; GHZ1
+        dc.b bgm_GHZ    ; GHZ1
+        even
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Level
@@ -2792,21 +2812,14 @@ Level_WaterPal:
 Level_GetBgm:
 		tst.w	(f_demo).w				; is this a credits demo?
 		bmi.s	Level_SkipTtlCard			; if yes, don't load title cards or change music
-
 		moveq	#0,d0					; clear d0
-		move.b	(v_zone).w,d0				; get current Zone ID
-		cmpi.w	#id_LZ_act4,(v_zone_act).w		; is level SBZ3 (LZ4)?
-		bne.s	Level_BgmNotLZ4				; if not, branch
-		moveq	#5,d0					; use 5th music (SBZ)
-
-Level_BgmNotLZ4:
-		cmpi.w	#id_FZ,(v_zone_act).w			; is level FZ?
-		bne.s	Level_PlayBgm				; if not, branch
-		moveq	#6,d0					; use 6th music (FZ)
-
-Level_PlayBgm:
+		move.b    (v_zone).w,d0
+		add.b    d0,d0
+		add.b    d0,d0
+		add.b    (v_act).w,d0
 		lea	(MusicList).l,a1			; load music playlist
 		move.b	(a1,d0.w),d0				; get music ID for current level
+		move.b    d0,(Saved_music).w
 		bsr.w	QueueSound1				; play music
 		move.b	#id_TitleCard,(v_titlecard).w		; load title card object
 ; ---------------------------------------------------------------------------
